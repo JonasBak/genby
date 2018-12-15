@@ -18,6 +18,17 @@ pub fn add<T: Vector>(vec1: &T, vec2: &T) -> T {
     T::new(&new_values)
 }
 
+pub fn diff<T: Vector>(vec1: &T, vec2: &T) -> T {
+    let values = vec1.slice();
+    let new_values: Vec<f32> = vec2
+        .slice()
+        .iter()
+        .enumerate()
+        .map(|(i, val)| values[i] - val)
+        .collect();
+    T::new(&new_values)
+}
+
 pub fn mul<T: Vector>(scalar: f32, vec: &T) -> T {
     let values: Vec<f32> = vec.slice().iter().map(|x| x * scalar).collect();
     T::new(&values)
