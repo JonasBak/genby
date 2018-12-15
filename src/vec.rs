@@ -47,19 +47,12 @@ pub fn normalize<T: Vector>(vec: &T) -> T {
     mul(1.0 / vec.len(), &vec)
 }
 
+#[derive(Debug)]
 pub struct Vec3([f32; 3]);
 
 impl Vec3 {
     pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
         Vec3([x, y, z])
-    }
-}
-
-pub struct Vec2([f32; 2]);
-
-impl Vec2 {
-    pub fn new(x: f32, y: f32) -> Vec2 {
-        Vec2([x, y])
     }
 }
 
@@ -73,6 +66,15 @@ impl Vector for Vec3 {
     }
 }
 
+#[derive(Debug)]
+pub struct Vec2([f32; 2]);
+
+impl Vec2 {
+    pub fn new(x: f32, y: f32) -> Vec2 {
+        Vec2([x, y])
+    }
+}
+
 impl Vector for Vec2 {
     fn slice(&self) -> &[f32] {
         &self.0
@@ -81,8 +83,4 @@ impl Vector for Vec2 {
     fn new(values: &[f32]) -> Vec2 {
         Vec2::new(values[0], values[1])
     }
-}
-
-pub fn print_len(vec: &impl Vector) {
-    println!("{}", vec.len());
 }
