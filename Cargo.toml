@@ -1,0 +1,6 @@
+[package]
+name = "genby"
+version = "0.1.0"
+authors = ["jonasbak <jonasxb@gmail.com>"]
+
+[dependencies]
