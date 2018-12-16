@@ -1,8 +1,13 @@
 use std::ops;
 
 pub trait Vector<T> {
-    fn slice(&self) -> &[T];
     fn new(values: &[T]) -> Self;
+
+    fn slice(&self) -> &[T];
+
+    fn get(&self, i: usize) -> &T {
+        &self.slice()[i]
+    }
 }
 
 pub fn add<T, E>(vec1: &T, vec2: &T) -> T
@@ -74,15 +79,19 @@ impl<T> Vec3<T> {
     pub fn new(x: T, y: T, z: T) -> Vec3<T> {
         Vec3([x, y, z])
     }
+
+    fn xyz(&self) -> (&T, &T, &T) {
+        (&self.0[0], &self.0[1], &self.0[2])
+    }
 }
 
 impl<T: Copy + Clone> Vector<T> for Vec3<T> {
-    fn slice(&self) -> &[T] {
-        &self.0
-    }
-
     fn new(values: &[T]) -> Vec3<T> {
         Vec3::new(values[0], values[1], values[2])
+    }
+
+    fn slice(&self) -> &[T] {
+        &self.0
     }
 }
 
@@ -93,15 +102,19 @@ impl<T> Vec2<T> {
     pub fn new(x: T, y: T) -> Vec2<T> {
         Vec2([x, y])
     }
+
+    fn xy(&self) -> (&T, &T) {
+        (&self.0[0], &self.0[1])
+    }
 }
 
 impl<T: Copy + Clone> Vector<T> for Vec2<T> {
-    fn slice(&self) -> &[T] {
-        &self.0
-    }
-
     fn new(values: &[T]) -> Vec2<T> {
         Vec2::new(values[0], values[1])
+    }
+
+    fn slice(&self) -> &[T] {
+        &self.0
     }
 }
 
