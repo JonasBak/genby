@@ -1,5 +1,6 @@
 extern crate rand;
 
+#[allow(dead_code)]
 mod perlin;
 mod vec;
 
@@ -15,4 +16,6 @@ fn main() {
     println!("{:?}", vec::normalize(&a));
 
     println!("{:?}", perlin::Grid::new(3, 3));
+
+    println!("{:?}", perlin::Grid::new(2, 2).generate_noise(2));
 }
