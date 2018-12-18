@@ -1,6 +1,7 @@
+#[allow(dead_code)]
+extern crate image;
 extern crate rand;
 
-#[allow(dead_code)]
 mod perlin;
 mod vec;
 
@@ -17,5 +18,7 @@ fn main() {
 
     println!("{:?}", perlin::Grid::new(3, 3));
 
-    println!("{:?}", perlin::Grid::new(2, 2).generate_noise(2));
+    perlin::Grid::new(8, 8)
+        .generate_noise(100)
+        .save_image("test.png");
 }
