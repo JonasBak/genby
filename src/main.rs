@@ -3,6 +3,7 @@ extern crate image;
 extern crate rand;
 
 mod perlin;
+mod utils;
 mod vec;
 
 fn main() {

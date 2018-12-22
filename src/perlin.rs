@@ -1,33 +1,6 @@
-use rand::Rng;
-use std::ops;
+use utils;
 use vec;
 use vec::Vector;
-
-fn new_random_vec() -> vec::Vec2f {
-    let mut rng = rand::thread_rng();
-    vec::normalize(&vec::Vec2f::new(
-        rng.gen::<f32>() - 0.5,
-        rng.gen::<f32>() - 0.5,
-    ))
-}
-
-fn interpolate(a: f32, b: f32, t: f32) -> f32 {
-    let u = t * t * (3.0 - 2.0 * t);
-    (1.0 - u) * a + u * b
-}
-
-fn map_range<T>(from: ops::Range<T>, to: ops::Range<T>, value: T) -> T
-where
-    T: PartialOrd<T>
-        + ops::Sub<T, Output = T>
-        + ops::Div<T, Output = T>
-        + ops::Mul<T, Output = T>
-        + ops::Add<T, Output = T>
-        + Copy
-        + Clone,
-{
-    (to.end - to.start) * (value - from.start) / (from.end - from.start) + to.start
-}
 
 #[derive(Debug)]
 pub struct Grid {
@@ -41,7 +14,9 @@ impl Grid {
         Grid {
             width: width,
             height: height,
-            grid: (0..width * height).map(|_| new_random_vec()).collect(),
+            grid: (0..width * height)
+                .map(|_| utils::new_random_vec())
+                .collect(),
         }
     }
 
@@ -93,9 +68,9 @@ impl Grid {
                 //    Some(x) => *x,
                 //    None => -1.0,
                 //}
-                interpolate(
-                    interpolate(weights[0], weights[1], *offsets.get(0)),
-                    interpolate(weights[2], weights[3], *offsets.get(0)),
+                utils::interpolate(
+                    utils::interpolate(weights[0], weights[1], *offsets.get(0)),
+                    utils::interpolate(weights[2], weights[3], *offsets.get(0)),
                     *offsets.get(1),
                 )
             })
@@ -121,7 +96,7 @@ impl Noise {
         let buffer: Vec<u8> = self
             .grid
             .iter()
-            .map(|x| map_range(-1.0..1.0, 0.0..255.0, *x) as u8)
+            .map(|x| utils::map_range(-1.0..1.0, 0.0..255.0, *x) as u8)
             .fold(vec![], |mut acc, x| {
                 acc.push(x);
                 acc.push(x);
