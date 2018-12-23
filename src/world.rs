@@ -2,6 +2,7 @@
 use perlin;
 use utils;
 
+#[derive(Copy, Clone)]
 enum Property {
     Gradient(f32, f32),
     Height(f32),
@@ -10,6 +11,7 @@ enum Property {
     Resources(f32),
 }
 
+#[derive(Copy, Clone)]
 struct CellProperties {
     gradient: Property,
     height: Property,
@@ -34,13 +36,13 @@ impl CellProperties {
         }
     }
 
-    fn step(self, delta: f32, neighborhood: Neighborhood) -> CellProperties {
+    fn step(current: &CellProperties, delta: f32, neighborhood: &Neighborhood) -> CellProperties {
         CellProperties {
-            gradient: self.gradient,
-            height: self.height,
-            water: update_property(self.water, delta, &neighborhood),
-            heat: update_property(self.heat, delta, &neighborhood),
-            resources: update_property(self.resources, delta, &neighborhood),
+            gradient: current.gradient,
+            height: current.height,
+            water: update_property(current.water, delta, neighborhood),
+            heat: update_property(current.heat, delta, neighborhood),
+            resources: update_property(current.resources, delta, neighborhood),
         }
     }
 }
@@ -59,7 +61,7 @@ struct Neighborhood {
     down: CellProperties,
     left: CellProperties,
     right: CellProperties,
-    own: CellProperties,
+    me: CellProperties,
 }
 
 struct Cell {
@@ -71,6 +73,11 @@ impl Cell {
         Cell {
             properties: CellProperties::new(description, x, y),
         }
+    }
+
+    fn update(&mut self, delta: f32, neighborhood: &Neighborhood) {
+        let new_props = CellProperties::step(&self.properties, delta, neighborhood);
+        self.properties = new_props;
     }
 
     fn to_pixel(&self) -> (u8, u8, u8) {
@@ -139,5 +146,24 @@ impl World {
             self.height,
             image::RGBA(8),
         );
+    }
+
+    pub fn update(&mut self, delta: f32) {
+        for i in 0..self.cells.len() {
+            let p = (i as u32 % self.width, i as u32 / self.height);
+            let p0 = (
+                (p.0 + self.width - 1) % self.width,
+                (p.1 + self.height - 1) % self.height,
+            );
+            let p1 = ((p.0 + 1) % self.width, (p.1 + 1) % self.height);
+            let neighborhood = Neighborhood {
+                up: self.cells[(p1.1 * self.width + p.0) as usize].properties,
+                down: self.cells[(p0.1 * self.width + p.0) as usize].properties,
+                left: self.cells[(p.1 * self.width + p0.0) as usize].properties,
+                right: self.cells[(p.1 * self.width + p1.0) as usize].properties,
+                me: self.cells[i].properties,
+            };
+            self.cells[i].update(delta, &neighborhood)
+        }
     }
 }
