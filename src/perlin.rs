@@ -24,18 +24,27 @@ impl Grid {
         (x as u32, y as u32)
     }
 
-    fn calculate_weight(&self, grid_x: u32, grid_y: u32, global_x: f32, global_y: f32) -> f32 {
-        let relative_point = vec::Vec2f::new(global_x - grid_x as f32, global_y - grid_y as f32);
+    fn calculate_weight(
+        &self,
+        grid_abs_x: u32,
+        grid_abs_y: u32,
+        global_x: f32,
+        global_y: f32,
+    ) -> f32 {
+        let grid_x = grid_abs_x % self.width;
+        let grid_y = grid_abs_y % self.height;
+        let relative_point =
+            vec::Vec2f::new(global_x - grid_abs_x as f32, global_y - grid_abs_y as f32);
 
         vec::dot(
-            &self.grid[(grid_x * self.width + grid_y) as usize],
+            &self.grid[(grid_y * self.width + grid_x) as usize],
             &relative_point,
         )
     }
 
     pub fn generate_noise(&self, resolution: u32) -> Noise {
-        let width = resolution * (self.width - 1);
-        let height = resolution * (self.height - 1);
+        let width = resolution * (self.width);
+        let height = resolution * (self.height);
         let size = width * height;
         let noise = (0..size)
             .map(|i| {
@@ -47,8 +56,9 @@ impl Grid {
                 let offsets = vec::Vec2f::new(global_x - grid_x as f32, global_y - grid_y as f32);
 
                 println!(
-                    "{:?}, {:?}, {:?}",
+                    "{:?}, {:?}, {:?}, {:?}",
                     (grid_x, grid_y),
+                    ((grid_x + 1) % self.width, (grid_y + 1) % self.height),
                     (global_x, global_y),
                     offsets
                 );
@@ -105,12 +115,25 @@ impl Noise {
                 acc
             });
 
-        image::save_buffer(
+        let _ = image::save_buffer(
             &std::path::Path::new(file),
             &buffer,
             self.width,
             self.height,
             image::RGBA(8),
         );
+    }
+
+    pub fn get_gradient(&self, x: u32, y: u32) -> (f32, f32) {
+        let p0 = ((x - 1) % self.width, (y - 1) % self.height);
+        let p1 = ((x + 1) % self.width, (y + 1) % self.height);
+        (
+            (self.get(p1.0, p0.1) - self.get(p0.0, p0.1)) / 2.0,
+            (self.get(p0.0, p1.1) - self.get(p0.0, p0.1)) / 2.0,
+        )
+    }
+
+    pub fn get(&self, x: u32, y: u32) -> f32 {
+        self.grid[(x + y * self.width) as usize]
     }
 }

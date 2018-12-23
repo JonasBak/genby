@@ -5,6 +5,7 @@ extern crate rand;
 mod perlin;
 mod utils;
 mod vec;
+mod world;
 
 fn main() {
     let a = vec::Vec3f::new(1.0, 4.0, 3.0);
@@ -19,7 +20,8 @@ fn main() {
 
     println!("{:?}", perlin::Grid::new(3, 3));
 
-    perlin::Grid::new(8, 8)
-        .generate_noise(100)
-        .save_image("test.png");
+    // perlin::Grid::new(8, 8)
+    //     .generate_noise(100)
+    //     .save_image("test.png");
+    world::World::new(400).save_image("test.png");
 }
