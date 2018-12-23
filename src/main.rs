@@ -23,5 +23,10 @@ fn main() {
     // perlin::Grid::new(8, 8)
     //     .generate_noise(100)
     //     .save_image("test.png");
-    world::World::new(400).save_image("test.png");
+    let mut world = world::World::new(400);
+    world.save_image("test.png");
+    for _ in 0..100 {
+        world.update(0.1);
+    }
+    world.save_image("test.png");
 }

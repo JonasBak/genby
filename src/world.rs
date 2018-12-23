@@ -3,21 +3,36 @@ use perlin;
 use utils;
 
 #[derive(Copy, Clone)]
-enum Property {
-    Gradient(f32, f32),
-    Height(f32),
-    Water(f32),
-    Heat(f32),
-    Resources(f32),
-}
+struct Gradient(f32, f32);
+
+#[derive(Copy, Clone)]
+struct Height(f32);
+
+#[derive(Copy, Clone)]
+struct Water(f32);
+
+#[derive(Copy, Clone)]
+struct Heat(f32);
+
+#[derive(Copy, Clone)]
+struct Resources(f32);
+
+//#[derive(Copy, Clone)]
+//enum Property {
+//    Gradient(f32, f32),
+//    Height(f32),
+//    Water(f32),
+//    Heat(f32),
+//    Resources(f32),
+//}
 
 #[derive(Copy, Clone)]
 struct CellProperties {
-    gradient: Property,
-    height: Property,
-    water: Property,
-    heat: Property,
-    resources: Property,
+    gradient: Gradient,
+    height: Height,
+    water: Water,
+    heat: Heat,
+    resources: Resources,
 }
 
 impl CellProperties {
@@ -28,11 +43,11 @@ impl CellProperties {
             waterlevel = 0.0;
         }
         CellProperties {
-            gradient: Property::Gradient(gradient.0, gradient.1),
-            height: Property::Height(description.heightmap.get(x, y)),
-            water: Property::Water(waterlevel),
-            heat: Property::Heat(0.0),
-            resources: Property::Resources(0.0),
+            gradient: Gradient(gradient.0, gradient.1),
+            height: Height(description.heightmap.get(x, y)),
+            water: Water(waterlevel),
+            heat: Heat(0.0),
+            resources: Resources(0.0),
         }
     }
 
@@ -40,19 +55,10 @@ impl CellProperties {
         CellProperties {
             gradient: current.gradient,
             height: current.height,
-            water: update_property(current.water, delta, neighborhood),
-            heat: update_property(current.heat, delta, neighborhood),
-            resources: update_property(current.resources, delta, neighborhood),
+            water: update_water(delta, neighborhood),
+            heat: update_heat(delta, neighborhood),
+            resources: update_resources(delta, neighborhood),
         }
-    }
-}
-
-fn update_property(prop: Property, delta: f32, neighborhood: &Neighborhood) -> Property {
-    match prop {
-        Property::Water(level) => {
-            Property::Water(level + delta * update_water(level, neighborhood))
-        }
-        _ => prop,
     }
 }
 
@@ -81,23 +87,25 @@ impl Cell {
     }
 
     fn to_pixel(&self) -> (u8, u8, u8) {
-        match self.properties.water {
-            Property::Water(level) if level > 0.0 => return (0, 0, 255),
-            _ => (),
-        };
-        match self.properties.height {
-            Property::Height(height) => {
-                let h = utils::map_range(-1.0..1.0, 0.0..255.0, height) as u8;
-                return (h, h, h);
-            }
-            _ => (),
-        };
-        (0, 0, 0)
+        if self.properties.water.0 > 0.0 {
+            return (0, 0, 255);
+        }
+
+        let h = utils::map_range(-1.0..1.0, 0.0..255.0, self.properties.height.0) as u8;
+        return (h, h, h);
     }
 }
 
-fn update_water(level: f32, neighborhood: &Neighborhood) -> f32 {
-    level
+fn update_water(delta: f32, neighborhood: &Neighborhood) -> Water {
+    Water(0.0)
+}
+
+fn update_heat(delta: f32, neighborhood: &Neighborhood) -> Heat {
+    Heat(0.0)
+}
+
+fn update_resources(delta: f32, neighborhood: &Neighborhood) -> Resources {
+    Resources(0.0)
 }
 
 pub struct World {
