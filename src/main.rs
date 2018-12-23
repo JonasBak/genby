@@ -26,7 +26,9 @@ fn main() {
     let mut world = world::World::new(400);
     world.save_image("test.png");
     for _ in 0..100 {
-        world.update(0.1);
+        for _ in 0..50 {
+            world.update(0.1);
+        }
+        world.save_image("test.png");
     }
-    world.save_image("test.png");
 }

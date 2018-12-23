@@ -1,5 +1,6 @@
 #[allow(dead_code)]
 use perlin;
+use std::cmp;
 use utils;
 
 #[derive(Copy, Clone)]
@@ -87,7 +88,7 @@ impl Cell {
     }
 
     fn to_pixel(&self) -> (u8, u8, u8) {
-        if self.properties.water.0 > 0.0 {
+        if self.properties.water.0 > 0.01 {
             return (0, 0, 255);
         }
 
@@ -96,8 +97,26 @@ impl Cell {
     }
 }
 
+fn water_diff(me: CellProperties, close: CellProperties) -> f32 {
+    if close.height.0 + close.water.0 > me.height.0 + me.water.0 {
+        close
+            .water
+            .0
+            .min(close.height.0 + close.water.0 - me.height.0 - me.water.0)
+    } else {
+        -me.water
+            .0
+            .min(-close.height.0 - close.water.0 + me.height.0 + me.water.0)
+    }
+}
+
 fn update_water(delta: f32, neighborhood: &Neighborhood) -> Water {
-    Water(0.0)
+    let diff_up = water_diff(neighborhood.me, neighborhood.up);
+    let diff_down = water_diff(neighborhood.me, neighborhood.down);
+    let diff_left = water_diff(neighborhood.me, neighborhood.left);
+    let diff_right = water_diff(neighborhood.me, neighborhood.right);
+
+    Water(neighborhood.me.water.0 + delta * (diff_up + diff_down + diff_left + diff_right))
 }
 
 fn update_heat(delta: f32, neighborhood: &Neighborhood) -> Heat {
