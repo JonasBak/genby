@@ -125,7 +125,10 @@ impl Noise {
     }
 
     pub fn get_gradient(&self, x: u32, y: u32) -> (f32, f32) {
-        let p0 = ((x - 1) % self.width, (y - 1) % self.height);
+        let p0 = (
+            (x + self.width - 1) % self.width,
+            (y + self.height - 1) % self.height,
+        );
         let p1 = ((x + 1) % self.width, (y + 1) % self.height);
         (
             (self.get(p1.0, p0.1) - self.get(p0.0, p0.1)) / 2.0,
