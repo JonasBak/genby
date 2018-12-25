@@ -2,6 +2,7 @@
 extern crate image;
 extern crate rand;
 
+mod cell;
 mod perlin;
 mod utils;
 mod vec;
@@ -25,9 +26,9 @@ fn main() {
     //     .save_image("test.png");
     let mut world = world::World::new(400);
     world.save_image("test.png");
-    for _ in 0..100 {
-        for _ in 0..50 {
-            world.update(0.1);
+    for _ in 0..50 {
+        for _ in 0..100 {
+            world.update(0.15);
         }
         world.save_image("test.png");
     }
