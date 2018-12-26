@@ -11,14 +11,16 @@ pub struct World {
 
 pub struct WorldDescription {
     pub heightmap: perlin::Noise,
+    pub windmap: perlin::Noise,
     pub waterlevel: perlin::Noise,
 }
 
 impl World {
-    pub fn new(size: u32) -> World {
+    pub fn new(grid: u32, size: u32) -> World {
         let description = WorldDescription {
-            heightmap: perlin::Grid::new(4, 4).generate_noise(size / 4),
-            waterlevel: perlin::Grid::new(4, 4).generate_noise(size / 4),
+            heightmap: perlin::Grid::new(grid, grid).generate_noise(size / grid),
+            windmap: perlin::Grid::new(grid, grid).generate_noise(size / grid),
+            waterlevel: perlin::Grid::new(grid, grid).generate_noise(size / grid),
         };
         World {
             cells: (0..size * size)
@@ -38,6 +40,28 @@ impl World {
                     acc.push(px.0);
                     acc.push(px.1);
                     acc.push(px.2);
+                    acc.push(255);
+                    acc
+                });
+
+        let _ = image::save_buffer(
+            &std::path::Path::new(file),
+            &buffer,
+            self.width,
+            self.height,
+            image::RGBA(8),
+        );
+    }
+
+    pub fn save_windmap(&self, file: &str) {
+        let buffer: Vec<u8> =
+            self.cells
+                .iter()
+                .map(|cell| cell.to_wind_pixel())
+                .fold(vec![], |mut acc, px| {
+                    acc.push(px.0);
+                    acc.push(px.1);
+                    acc.push(0);
                     acc.push(255);
                     acc
                 });

@@ -69,10 +69,15 @@ where
 }
 
 pub fn normalize<T: Vector<f32>>(vec: &T) -> T {
-    mul(1.0 / len(vec), &vec)
+    let length = len(vec);
+    if length == 0.0 {
+        T::new(vec.slice())
+    } else {
+        mul(1.0 / length, &vec)
+    }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vec3<T>([T; 3]);
 
 impl<T> Vec3<T> {
@@ -80,7 +85,7 @@ impl<T> Vec3<T> {
         Vec3([x, y, z])
     }
 
-    fn xyz(&self) -> (&T, &T, &T) {
+    pub fn xyz(&self) -> (&T, &T, &T) {
         (&self.0[0], &self.0[1], &self.0[2])
     }
 }
@@ -95,7 +100,7 @@ impl<T: Copy + Clone> Vector<T> for Vec3<T> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vec2<T>([T; 2]);
 
 impl<T> Vec2<T> {
@@ -103,7 +108,7 @@ impl<T> Vec2<T> {
         Vec2([x, y])
     }
 
-    fn xy(&self) -> (&T, &T) {
+    pub fn xy(&self) -> (&T, &T) {
         (&self.0[0], &self.0[1])
     }
 }

@@ -24,12 +24,15 @@ fn main() {
     // perlin::Grid::new(8, 8)
     //     .generate_noise(100)
     //     .save_image("test.png");
-    let mut world = world::World::new(400);
+    let mut world = world::World::new(4, 200);
     world.save_image("test.png");
-    for _ in 0..50 {
-        for _ in 0..100 {
+    world.save_windmap("test-windmap.png");
+    for _ in 0..100 {
+        for _ in 0..50 {
             world.update(0.15);
         }
+        println!("Images updated");
         world.save_image("test.png");
+        world.save_windmap("test-windmap.png");
     }
 }
