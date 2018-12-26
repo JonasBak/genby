@@ -144,7 +144,8 @@ fn update_air_pressure(delta: f32, neighborhood: &Neighborhood) -> AirPressure {
     // let diff_right = neighborhood.right.air_pressure.0 - neighborhood.me.air_pressure.0;
 
     AirPressure(
-        neighborhood.me.air_pressure.0 + delta * (diff_down + diff_up + diff_left + diff_right),
+        neighborhood.me.air_pressure.0
+            + delta / 2.0 * (diff_down + diff_up + diff_left + diff_right),
     )
 }
 
