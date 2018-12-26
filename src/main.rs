@@ -24,7 +24,7 @@ fn main() {
     // perlin::Grid::new(8, 8)
     //     .generate_noise(100)
     //     .save_image("test.png");
-    let mut world = world::World::new(4, 200);
+    let mut world = world::World::new(2, 100);
     world.save_generic("test.png", |cell| cell.to_pixel());
     world.save_generic("test-windmap.png", |cell| cell.to_wind_pixel());
     for _ in 0..1000 {
