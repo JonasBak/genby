@@ -31,37 +31,18 @@ impl World {
         }
     }
 
-    pub fn save_image(&self, file: &str) {
+    pub fn save_generic<T>(&self, file: &str, to_pixel: T)
+    where
+        T: Fn(&cell::Cell) -> (u8, u8, u8),
+    {
         let buffer: Vec<u8> =
             self.cells
                 .iter()
-                .map(|cell| cell.to_pixel())
+                .map(|cell| to_pixel(cell))
                 .fold(vec![], |mut acc, px| {
                     acc.push(px.0);
                     acc.push(px.1);
                     acc.push(px.2);
-                    acc.push(255);
-                    acc
-                });
-
-        let _ = image::save_buffer(
-            &std::path::Path::new(file),
-            &buffer,
-            self.width,
-            self.height,
-            image::RGBA(8),
-        );
-    }
-
-    pub fn save_windmap(&self, file: &str) {
-        let buffer: Vec<u8> =
-            self.cells
-                .iter()
-                .map(|cell| cell.to_wind_pixel())
-                .fold(vec![], |mut acc, px| {
-                    acc.push(px.0);
-                    acc.push(px.1);
-                    acc.push(0);
                     acc.push(255);
                     acc
                 });

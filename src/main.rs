@@ -25,14 +25,14 @@ fn main() {
     //     .generate_noise(100)
     //     .save_image("test.png");
     let mut world = world::World::new(4, 200);
-    world.save_image("test.png");
-    world.save_windmap("test-windmap.png");
-    for _ in 0..100 {
-        for _ in 0..50 {
+    world.save_generic("test.png", |cell| cell.to_pixel());
+    world.save_generic("test-windmap.png", |cell| cell.to_wind_pixel());
+    for _ in 0..1000 {
+        for _ in 0..10 {
             world.update(0.15);
         }
         println!("Images updated");
-        world.save_image("test.png");
-        world.save_windmap("test-windmap.png");
+        world.save_generic("test.png", |cell| cell.to_airpressure_pixel());
+        world.save_generic("test-windmap.png", |cell| cell.to_wind_pixel());
     }
 }
