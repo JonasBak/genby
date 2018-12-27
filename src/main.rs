@@ -1,6 +1,8 @@
 #[allow(dead_code)]
+extern crate cfg_if;
 extern crate image;
 extern crate rand;
+extern crate wasm_bindgen;
 
 mod cell;
 mod perlin;
