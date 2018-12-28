@@ -25,7 +25,6 @@ where
     T::new(&new_values)
 }
 
-//pub fn diff<T: Vector>(vec1: &T, vec2: &T) -> T {
 pub fn diff<T, E>(vec1: &T, vec2: &T) -> T
 where
     E: ops::Sub<Output = E> + Copy + Clone,
@@ -41,7 +40,6 @@ where
     T::new(&new_values)
 }
 
-//pub fn mul<T: Vector<f32>>(scalar: f32, vec: &T) -> T {
 pub fn mul<T, E, S>(scalar: S, vec: &T) -> T
 where
     S: Copy + Clone,

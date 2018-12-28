@@ -8,7 +8,7 @@ use world;
 pub struct Gradient(vec::Vec2f);
 
 #[derive(Copy, Clone)]
-pub struct Height(f32);
+pub struct Height(pub f32);
 
 #[derive(Copy, Clone)]
 pub struct AirPressure(f32);
@@ -90,7 +90,7 @@ impl Cell {
 #[derive(Copy, Clone)]
 pub struct CellProperties {
     gradient: Gradient,
-    height: Height,
+    pub height: Height,
     air_pressure: AirPressure,
     wind: Wind,
     water: Water,
@@ -157,9 +157,12 @@ fn update_wind(delta: f32, neighborhood: &Neighborhood) -> Wind {
 
     let (current_x, current_y) = neighborhood.me.wind.0.xy();
 
+    let gradient_x = (neighborhood.right.total_height() - neighborhood.left.total_height()) / 2.0;
+    let gradient_y = (neighborhood.up.total_height() - neighborhood.down.total_height()) / 2.0;
+
     Wind(vec::Vec2f::new(
-        current_x + delta * (diff_left - diff_right - current_x),
-        current_y + delta * (diff_down - diff_up - current_y),
+        current_x + delta * (diff_left - diff_right - current_x - gradient_x),
+        current_y + delta * (diff_down - diff_up - current_y - gradient_y),
     ))
 }
 
