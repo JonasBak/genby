@@ -8,7 +8,7 @@ use world;
 pub struct Gradient(vec::Vec2f);
 
 #[derive(Copy, Clone)]
-pub struct Height(f32);
+pub struct Height(pub f32);
 
 #[derive(Copy, Clone)]
 pub struct AirPressure(f32);
@@ -90,7 +90,7 @@ impl Cell {
 #[derive(Copy, Clone)]
 pub struct CellProperties {
     gradient: Gradient,
-    height: Height,
+    pub height: Height,
     air_pressure: AirPressure,
     wind: Wind,
     water: Water,

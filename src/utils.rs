@@ -1,5 +1,5 @@
 use cfg_if::cfg_if;
-use rand::Rng;
+//use rand::Rng;
 use std::ops;
 use vec;
 
@@ -20,10 +20,14 @@ cfg_if! {
 }
 
 pub fn new_random_vec() -> vec::Vec2f {
-    let mut rng = rand::thread_rng();
+    //let mut rng = rand::thread_rng();
+    //vec::normalize(&vec::Vec2f::new(
+    //    rng.gen::<f32>() - 0.5,
+    //    rng.gen::<f32>() - 0.5,
+    //))
     vec::normalize(&vec::Vec2f::new(
-        rng.gen::<f32>() - 0.5,
-        rng.gen::<f32>() - 0.5,
+        js_sys::Math::random() as f32 - 0.5,
+        js_sys::Math::random() as f32 - 0.5,
     ))
 }
 

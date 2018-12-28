@@ -31,6 +31,13 @@ impl World {
         }
     }
 
+    pub fn ref_cell_prop<T, E>(&self, to_prop: T) -> Vec<E>
+    where
+        T: Fn(&cell::Cell) -> E,
+    {
+        self.cells.iter().map(|cell| to_prop(cell)).collect()
+    }
+
     pub fn save_generic<T>(&self, file: &str, to_pixel: T)
     where
         T: Fn(&cell::Cell) -> (u8, u8, u8),

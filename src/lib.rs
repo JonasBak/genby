@@ -1,7 +1,8 @@
 #[allow(dead_code)]
 extern crate cfg_if;
 extern crate image;
-extern crate rand;
+//extern crate rand;
+extern crate js_sys;
 extern crate wasm_bindgen;
 
 mod cell;
@@ -23,12 +24,36 @@ cfg_if! {
     }
 }
 
+static mut current_world: Option<world::World> = None;
+
 #[wasm_bindgen]
 extern "C" {
     fn alert(s: &str);
 }
 
 #[wasm_bindgen]
-pub fn greet() {
-    alert("Test hehe");
+pub fn create(x: f32, y: f32) {
+    unsafe {
+        current_world = Some(world::World::new(5, 100));
+    }
+}
+
+#[wasm_bindgen]
+pub fn tick(dt: f32) {
+    unsafe {
+        match current_world {
+            Some(ref mut world) => world.update(dt),
+            _ => (),
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub fn export_height() -> Vec<f32> {
+    unsafe {
+        match current_world {
+            Some(ref world) => world.ref_cell_prop(|cell| cell.properties.height.0),
+            _ => vec![],
+        }
+    }
 }

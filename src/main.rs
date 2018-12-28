@@ -1,7 +1,8 @@
 #[allow(dead_code)]
 extern crate cfg_if;
 extern crate image;
-extern crate rand;
+//extern crate rand;
+extern crate js_sys;
 extern crate wasm_bindgen;
 
 mod cell;
