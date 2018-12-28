@@ -38,6 +38,10 @@ impl World {
         self.cells.iter().map(|cell| to_prop(cell)).collect()
     }
 
+    pub fn size(&self) -> (u32, u32) {
+        (self.width, self.height)
+    }
+
     pub fn save_generic<T>(&self, file: &str, to_pixel: T)
     where
         T: Fn(&cell::Cell) -> (u8, u8, u8),

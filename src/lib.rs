@@ -49,6 +49,17 @@ pub fn tick(dt: f32) {
 }
 
 #[wasm_bindgen]
+pub fn size() -> Vec<u32> {
+    unsafe {
+        let (x, y) = match current_world {
+            Some(ref world) => world.size(),
+            _ => (0, 0),
+        };
+        vec![x, y]
+    }
+}
+
+#[wasm_bindgen]
 pub fn export_height() -> Vec<f32> {
     unsafe {
         match current_world {
