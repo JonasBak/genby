@@ -107,6 +107,18 @@ export function get_wind_directions() {
 
 }
 
+/**
+* @param {number} arg0
+* @param {number} arg1
+* @param {number} arg2
+* @param {number} arg3
+* @param {number} arg4
+* @returns {void}
+*/
+export function alter_world(arg0, arg1, arg2, arg3, arg4) {
+    return wasm.alter_world(arg0, arg1, arg2, arg3, arg4);
+}
+
 export function __wbg_random_2cc0c8d054a5c72a() {
     return Math.random();
 }

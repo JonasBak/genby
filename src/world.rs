@@ -80,4 +80,17 @@ impl World {
         }
         self.cells = updated_cells;
     }
+
+    pub fn select_cells(&self, center: (u32, u32), radius: u32) -> Vec<usize> {
+        let mut indices = vec![];
+        for x in -(radius as i32)..(radius as i32) {
+            let r_y = (((radius * radius) as i32 - x * x) as f32).sqrt() as i32;
+            for y in -r_y..r_y {
+                let px = (center.0 as i32 + x + self.width as i32) % (self.width as i32);
+                let py = (center.1 as i32 + y + self.height as i32) % (self.height as i32);
+                indices.push((py * (self.width as i32) + px) as usize);
+            }
+        }
+        indices
+    }
 }

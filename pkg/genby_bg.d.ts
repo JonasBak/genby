@@ -6,4 +6,5 @@ export function tick(a: number): void;
 export function size(a: number): void;
 export function get_pixels(a: number): void;
 export function get_wind_directions(a: number): void;
+export function alter_world(a: number, b: number, c: number, d: number, e: number): void;
 export function __wbindgen_free(a: number, b: number): void;

@@ -112,6 +112,14 @@ impl CellProperties {
             resources: update_resources(delta, neighborhood),
         }
     }
+
+    pub fn alter_properties(&self, d_water: f32, d_air_pressure: f32) -> CellProperties {
+        CellProperties {
+            water: Water((self.water.0 + d_water).max(0.0)),
+            air_pressure: AirPressure(self.air_pressure.0 + d_air_pressure),
+            ..*self
+        }
+    }
 }
 
 fn update_air_pressure(delta: f32, neighborhood: &Neighborhood) -> AirPressure {

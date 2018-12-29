@@ -47,4 +47,10 @@ const loop = () => {
   requestAnimationFrame(loop);
 };
 
+canvas.addEventListener("click", e => {
+  const x = e.layerX/cellSize;
+  const y = e.layerY/cellSize;
+  wasm.alter_world(x, y, 10, 0.5, 0);
+});
+
 loop();
