@@ -4,26 +4,26 @@ use vec;
 use vec::Vector;
 use world;
 
-#[derive(Copy, Clone)]
-pub struct Gradient(vec::Vec2f);
+//#[derive(Copy, Clone)]
+//pub struct Gradient(pub vec::Vec2f);
 
 #[derive(Copy, Clone)]
 pub struct Height(pub f32);
 
 #[derive(Copy, Clone)]
-pub struct AirPressure(f32);
+pub struct AirPressure(pub f32);
 
 #[derive(Copy, Clone)]
 pub struct Wind(pub vec::Vec2f);
 
 #[derive(Copy, Clone)]
-pub struct Water(f32);
+pub struct Water(pub f32);
 
 #[derive(Copy, Clone)]
-pub struct Heat(f32);
+pub struct Heat(pub f32);
 
 #[derive(Copy, Clone)]
-pub struct Resources(f32);
+pub struct Resources(pub f32);
 
 pub struct Neighborhood {
     pub up: CellProperties,
@@ -64,44 +64,19 @@ impl Cell {
             0.0..255.0,
             (self.properties.height.0 + 1.0) * (1.0 - w),
         );
-        return (h as u8, h as u8, if w > 0.1 { 255 } else { h as u8 });
-    }
-
-    pub fn to_wind_pixel(&self) -> (u8, u8, u8) {
-        let (x, y) = self.properties.wind.0.xy();
-
-        let wind_x = (x * 10.0).max(-1.0).min(1.0);
-        let wind_y = (y * 10.0).max(-1.0).min(1.0);
-
-        (
-            (wind_x * 255.0 / 2.0 + 255.0 / 2.0) as u8,
-            (wind_y * 255.0 / 2.0 + 255.0 / 2.0) as u8,
-            0,
-        )
-    }
-
-    pub fn to_airpressure_pixel(&self) -> (u8, u8, u8) {
-        let mut pressure = self.properties.air_pressure.0 * 0.5;
-
-        pressure = pressure.max(0.0).min(1.0);
-
-        (
-            (pressure * 255.0) as u8,
-            (pressure * 255.0) as u8,
-            (pressure * 255.0) as u8,
-        )
+        return (h as u8, h as u8, if w > 0.05 { 255 } else { h as u8 });
     }
 }
 
 #[derive(Copy, Clone)]
 pub struct CellProperties {
-    gradient: Gradient,
+    //pub gradient: Gradient,
     pub height: Height,
-    air_pressure: AirPressure,
+    pub air_pressure: AirPressure,
     pub wind: Wind,
-    water: Water,
-    heat: Heat,
-    resources: Resources,
+    pub water: Water,
+    pub heat: Heat,
+    pub resources: Resources,
 }
 
 impl CellProperties {
@@ -112,7 +87,7 @@ impl CellProperties {
             waterlevel = 0.0;
         }
         CellProperties {
-            gradient: Gradient(description.heightmap.get_gradient(x, y)),
+            //gradient: Gradient(description.heightmap.get_gradient(x, y)),
             height: Height(description.heightmap.get(x, y)),
             air_pressure: AirPressure(description.windmap.get(x, y) + 1.0),
             wind: Wind(vec::Vec2f::new(0.0, 0.0)),
@@ -128,7 +103,7 @@ impl CellProperties {
 
     fn step(current: &CellProperties, delta: f32, neighborhood: &Neighborhood) -> CellProperties {
         CellProperties {
-            gradient: current.gradient,
+            //gradient: current.gradient,
             height: current.height,
             air_pressure: update_air_pressure(delta, neighborhood),
             wind: update_wind(delta, neighborhood),
@@ -151,7 +126,7 @@ fn update_air_pressure(delta: f32, neighborhood: &Neighborhood) -> AirPressure {
 
     AirPressure(
         neighborhood.me.air_pressure.0
-            + delta / 2.0 * (diff_down + diff_up + diff_left + diff_right),
+            + delta / 5.0 * (diff_down + diff_up + diff_left + diff_right),
     )
 }
 

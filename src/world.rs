@@ -4,9 +4,9 @@ use perlin;
 use utils;
 
 pub struct World {
-    cells: Vec<cell::Cell>,
-    width: u32,
-    height: u32,
+    pub cells: Vec<cell::Cell>,
+    pub width: u32,
+    pub height: u32,
 }
 
 pub struct WorldDescription {
@@ -29,13 +29,6 @@ impl World {
             width: size,
             height: size,
         }
-    }
-
-    pub fn ref_cell_prop<T, E>(&self, to_prop: T) -> Vec<E>
-    where
-        T: Fn(&cell::Cell) -> E,
-    {
-        self.cells.iter().map(|cell| to_prop(cell)).collect()
     }
 
     pub fn size(&self) -> (u32, u32) {

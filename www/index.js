@@ -22,10 +22,10 @@ const drawWorld = cells => {
 
 const drawWind = winds => {
   ctx.beginPath();
-  for (let x = 1; x < 10; x++) {
-    for (let y = 1; y < 10; y++) {
-      const x0 = x * (worldSize[0]/ 10);
-      const y0 = y * (worldSize[1]/ 10);
+  for (let x = 1; x < 20; x++) {
+    for (let y = 1; y < 20; y++) {
+      const x0 = x * (worldSize[0]/ 20);
+      const y0 = y * (worldSize[1]/ 20);
       let i = y0  * worldSize[0] + x0;
 
       const windFactor = 500;
