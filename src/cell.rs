@@ -14,7 +14,7 @@ pub struct Height(pub f32);
 pub struct AirPressure(f32);
 
 #[derive(Copy, Clone)]
-pub struct Wind(vec::Vec2f);
+pub struct Wind(pub vec::Vec2f);
 
 #[derive(Copy, Clone)]
 pub struct Water(f32);
@@ -35,12 +35,16 @@ pub struct Neighborhood {
 
 pub struct Cell {
     pub properties: CellProperties,
+    pub x: u32,
+    pub y: u32,
 }
 
 impl Cell {
     pub fn new(description: &world::WorldDescription, x: u32, y: u32) -> Cell {
         Cell {
             properties: CellProperties::new(description, x, y),
+            x: x,
+            y: y,
         }
     }
 
@@ -48,6 +52,8 @@ impl Cell {
         let new_props = CellProperties::step(&self.properties, delta, neighborhood);
         Cell {
             properties: new_props,
+            x: self.x,
+            y: self.y,
         }
     }
 
@@ -92,7 +98,7 @@ pub struct CellProperties {
     gradient: Gradient,
     pub height: Height,
     air_pressure: AirPressure,
-    wind: Wind,
+    pub wind: Wind,
     water: Water,
     heat: Heat,
     resources: Resources,

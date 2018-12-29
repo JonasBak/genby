@@ -1,4 +1,5 @@
 use std::ops;
+use wasm_bindgen::prelude::*;
 
 pub trait Vector<T> {
     fn new(values: &[T]) -> Self;
@@ -121,5 +122,32 @@ impl<T: Copy + Clone> Vector<T> for Vec2<T> {
     }
 }
 
+//#[wasm_bindgen]
+//#[derive(Debug, Copy, Clone)]
+//pub struct WasmVec2f {
+//    values: [f32; 2],
+//}
+//
+//impl WasmVec2f {
+//    pub fn new(x: f32, y: f32) -> WasmVec2f {
+//        WasmVec2f { values: [x, y] }
+//    }
+//
+//    pub fn xy(&self) -> (&f32, &f32) {
+//        (&self.values[0], &self.values[1])
+//    }
+//}
+//
+//impl Vector<f32> for WasmVec2f {
+//    fn new(values: &[f32]) -> WasmVec2f {
+//        WasmVec2f::new(values[0], values[1])
+//    }
+//
+//    fn slice(&self) -> &[f32] {
+//        &self.values
+//    }
+//}
+
 pub type Vec3f = Vec3<f32>;
 pub type Vec2f = Vec2<f32>;
+//pub type Vec2f = WasmVec2f;

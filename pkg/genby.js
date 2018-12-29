@@ -53,6 +53,33 @@ export function size() {
 
 }
 
+let cachegetUint8Memory = null;
+function getUint8Memory() {
+    if (cachegetUint8Memory === null || cachegetUint8Memory.buffer !== wasm.memory.buffer) {
+        cachegetUint8Memory = new Uint8Array(wasm.memory.buffer);
+    }
+    return cachegetUint8Memory;
+}
+
+function getArrayU8FromWasm(ptr, len) {
+    return getUint8Memory().subarray(ptr / 1, ptr / 1 + len);
+}
+/**
+* @returns {Uint8Array}
+*/
+export function get_pixels() {
+    const retptr = globalArgumentPtr();
+    wasm.get_pixels(retptr);
+    const mem = getUint32Memory();
+    const rustptr = mem[retptr / 4];
+    const rustlen = mem[retptr / 4 + 1];
+
+    const realRet = getArrayU8FromWasm(rustptr, rustlen).slice();
+    wasm.__wbindgen_free(rustptr, rustlen * 1);
+    return realRet;
+
+}
+
 let cachegetFloat32Memory = null;
 function getFloat32Memory() {
     if (cachegetFloat32Memory === null || cachegetFloat32Memory.buffer !== wasm.memory.buffer) {
@@ -67,9 +94,9 @@ function getArrayF32FromWasm(ptr, len) {
 /**
 * @returns {Float32Array}
 */
-export function export_height() {
+export function get_wind_directions() {
     const retptr = globalArgumentPtr();
-    wasm.export_height(retptr);
+    wasm.get_wind_directions(retptr);
     const mem = getUint32Memory();
     const rustptr = mem[retptr / 4];
     const rustlen = mem[retptr / 4 + 1];
@@ -85,14 +112,6 @@ export function __wbg_random_2cc0c8d054a5c72a() {
 }
 
 let cachedTextDecoder = new TextDecoder('utf-8');
-
-let cachegetUint8Memory = null;
-function getUint8Memory() {
-    if (cachegetUint8Memory === null || cachegetUint8Memory.buffer !== wasm.memory.buffer) {
-        cachegetUint8Memory = new Uint8Array(wasm.memory.buffer);
-    }
-    return cachegetUint8Memory;
-}
 
 function getStringFromWasm(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));

@@ -60,11 +60,43 @@ pub fn size() -> Vec<u32> {
 }
 
 #[wasm_bindgen]
-pub fn export_height() -> Vec<f32> {
+pub fn get_pixels() -> Vec<u8> {
     unsafe {
-        match current_world {
-            Some(ref world) => world.ref_cell_prop(|cell| cell.properties.height.0),
-            _ => vec![],
+        if let Some(ref world) = current_world {
+            let (width, height) = world.size();
+            let mut pixels = vec![0; (width * height * 3) as usize];
+            let new_px = world.ref_cell_prop(|cell| cell.to_pixel());
+            for (i, px) in new_px.iter().enumerate() {
+                pixels[3 * i] = px.0;
+                pixels[3 * i + 1] = px.1;
+                pixels[3 * i + 2] = px.2;
+            }
+            pixels
+        } else {
+            vec![]
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub fn get_wind_directions() -> Vec<f32> {
+    unsafe {
+        if let Some(ref world) = current_world {
+            let (width, height) = world.size();
+            let mut pixels = vec![0.0; (width * height * 2) as usize];
+            let new_px = world.ref_cell_prop(|cell| {
+                (
+                    *cell.properties.wind.0.xy().0,
+                    *cell.properties.wind.0.xy().1,
+                )
+            });
+            for (i, px) in new_px.iter().enumerate() {
+                pixels[2 * i] = px.0;
+                pixels[2 * i + 1] = px.1;
+            }
+            pixels
+        } else {
+            vec![]
         }
     }
 }

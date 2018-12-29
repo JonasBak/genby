@@ -10,16 +10,41 @@ const worldSize = wasm.size()
 canvas.width = cellSize * worldSize[0];
 canvas.height = cellSize * worldSize[1];
 
-const drawWorld = (heights) => {
-  console.log(worldSize);
+const drawWorld = cells => {
   for (let x = 0; x < worldSize[0]; x++) {
     for (let y = 0; y < worldSize[1]; y++) {
-      const h = heights[y * worldSize[0] + x];
-      const color = h * 255/2 + 255/2;
-      ctx.fillStyle = "rgb(" + color + "," + color + "," + color + ")";
+      let i = y * worldSize[0] + x;
+      ctx.fillStyle = "rgb(" + cells[3 * i] + "," + cells[3 * i + 1] + "," + cells[3 * i + 2] + ")";
       ctx.fillRect(x*cellSize, y * cellSize, cellSize, cellSize);
     }
   }
+};
+
+const drawWind = winds => {
+  ctx.beginPath();
+  for (let x = 1; x < 10; x++) {
+    for (let y = 1; y < 10; y++) {
+      const x0 = x * (worldSize[0]/ 10);
+      const y0 = y * (worldSize[1]/ 10);
+      let i = y0  * worldSize[0] + x0;
+
+      const windFactor = 500;
+
+      ctx.moveTo(x0 * cellSize, y0 * cellSize);
+      ctx.lineTo(x0 * cellSize + winds[2*i ] * windFactor, y0 * cellSize + winds[2*i + 1] * windFactor);
+      
+    }
+  }
+  ctx.stroke();
+  ctx.closePath();
+
 }
 
-drawWorld(wasm.export_height());
+const loop = () => {
+  wasm.tick(0.1);
+  drawWorld(wasm.get_pixels());
+  drawWind(wasm.get_wind_directions());
+  requestAnimationFrame(loop);
+};
+
+loop();
