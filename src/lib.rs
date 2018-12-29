@@ -83,12 +83,28 @@ pub fn get_wind_directions() -> Vec<f32> {
     unsafe {
         if let Some(ref world) = current_world {
             let (width, height) = world.size();
-            let mut pixels = vec![0.0; (width * height * 2) as usize];
+            let mut directions = vec![0.0; (width * height * 2) as usize];
             for (i, cell) in world.cells.iter().enumerate() {
-                pixels[2 * i] = *cell.properties.wind.0.xy().0;
-                pixels[2 * i + 1] = *cell.properties.wind.0.xy().1;
+                directions[2 * i] = *cell.properties.wind.0.xy().0;
+                directions[2 * i + 1] = *cell.properties.wind.0.xy().1;
             }
-            pixels
+            directions
+        } else {
+            vec![]
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub fn get_air_pressure() -> Vec<f32> {
+    unsafe {
+        if let Some(ref world) = current_world {
+            let (width, height) = world.size();
+            let mut pressure = vec![0.0; (width * height) as usize];
+            for (i, cell) in world.cells.iter().enumerate() {
+                pressure[i] = cell.properties.air_pressure.0;
+            }
+            pressure
         } else {
             vec![]
         }

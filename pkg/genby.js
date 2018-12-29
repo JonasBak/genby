@@ -108,6 +108,22 @@ export function get_wind_directions() {
 }
 
 /**
+* @returns {Float32Array}
+*/
+export function get_air_pressure() {
+    const retptr = globalArgumentPtr();
+    wasm.get_air_pressure(retptr);
+    const mem = getUint32Memory();
+    const rustptr = mem[retptr / 4];
+    const rustlen = mem[retptr / 4 + 1];
+
+    const realRet = getArrayF32FromWasm(rustptr, rustlen).slice();
+    wasm.__wbindgen_free(rustptr, rustlen * 4);
+    return realRet;
+
+}
+
+/**
 * @param {number} arg0
 * @param {number} arg1
 * @param {number} arg2

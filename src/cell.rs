@@ -89,7 +89,7 @@ impl CellProperties {
         CellProperties {
             //gradient: Gradient(description.heightmap.get_gradient(x, y)),
             height: Height(description.heightmap.get(x, y)),
-            air_pressure: AirPressure(description.windmap.get(x, y) + 1.0),
+            air_pressure: AirPressure(1.0), //AirPressure(description.windmap.get(x, y) + 1.0),
             wind: Wind(vec::Vec2f::new(0.0, 0.0)),
             water: Water(waterlevel),
             heat: Heat(0.0),
@@ -123,35 +123,36 @@ impl CellProperties {
 }
 
 fn update_air_pressure(delta: f32, neighborhood: &Neighborhood) -> AirPressure {
+    let propagation_factor = 0.3;
+
     let diff_down = neighborhood.down.wind.0.get(1);
     let diff_up = -neighborhood.up.wind.0.get(1);
     let diff_left = neighborhood.left.wind.0.get(0);
     let diff_right = -neighborhood.right.wind.0.get(0);
-    // let diff_down = neighborhood.down.air_pressure.0 - neighborhood.me.air_pressure.0;
-    // let diff_up = neighborhood.up.air_pressure.0 - neighborhood.me.air_pressure.0;
-    // let diff_left = neighborhood.left.air_pressure.0 - neighborhood.me.air_pressure.0;
-    // let diff_right = neighborhood.right.air_pressure.0 - neighborhood.me.air_pressure.0;
 
     AirPressure(
         neighborhood.me.air_pressure.0
-            + delta / 5.0 * (diff_down + diff_up + diff_left + diff_right),
+            + delta * propagation_factor * (diff_down + diff_up + diff_left + diff_right),
     )
 }
 
 fn update_wind(delta: f32, neighborhood: &Neighborhood) -> Wind {
-    let diff_down = neighborhood.down.air_pressure.0 - neighborhood.me.air_pressure.0;
-    let diff_up = neighborhood.up.air_pressure.0 - neighborhood.me.air_pressure.0;
-    let diff_left = neighborhood.left.air_pressure.0 - neighborhood.me.air_pressure.0;
-    let diff_right = neighborhood.right.air_pressure.0 - neighborhood.me.air_pressure.0;
+    let gravity_factor = 0.2;
+
+    let diff_down = neighborhood.down.air_pressure.0 - neighborhood.me.air_pressure.0
+        + (neighborhood.down.total_height() - neighborhood.me.total_height()) * gravity_factor;
+    let diff_up = neighborhood.up.air_pressure.0 - neighborhood.me.air_pressure.0
+        + (neighborhood.up.total_height() - neighborhood.me.total_height()) * gravity_factor;
+    let diff_left = neighborhood.left.air_pressure.0 - neighborhood.me.air_pressure.0
+        + (neighborhood.left.total_height() - neighborhood.me.total_height()) * gravity_factor;
+    let diff_right = neighborhood.right.air_pressure.0 - neighborhood.me.air_pressure.0
+        + (neighborhood.right.total_height() - neighborhood.me.total_height()) * gravity_factor;
 
     let (current_x, current_y) = neighborhood.me.wind.0.xy();
 
-    let gradient_x = (neighborhood.right.total_height() - neighborhood.left.total_height()) / 2.0;
-    let gradient_y = (neighborhood.up.total_height() - neighborhood.down.total_height()) / 2.0;
-
     Wind(vec::Vec2f::new(
-        current_x + delta * (diff_left - diff_right - current_x - gradient_x),
-        current_y + delta * (diff_down - diff_up - current_y - gradient_y),
+        current_x + delta * (diff_left - diff_right - current_x),
+        current_y + delta * (diff_down - diff_up - current_y),
     ))
 }
 
