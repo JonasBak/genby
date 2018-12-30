@@ -60,18 +60,45 @@ pub fn size() -> Vec<u32> {
 }
 
 #[wasm_bindgen]
-pub fn get_pixels() -> Vec<u8> {
+pub fn get_pixels(draw_height: bool, draw_water: bool, draw_air_pressure: bool) -> Vec<u8> {
     unsafe {
         if let Some(ref world) = current_world {
             let (width, height) = world.size();
-            let mut pixels = vec![0; (width * height * 3) as usize];
+            let mut props = vec![0; (width * height * 3) as usize];
             for (i, cell) in world.cells.iter().enumerate() {
-                let px = cell.to_pixel();
-                pixels[3 * i] = px.0;
-                pixels[3 * i + 1] = px.1;
-                pixels[3 * i + 2] = px.2;
+                let mut r = 0;
+                let mut g = 0;
+                let mut b = 0;
+
+                if draw_height {
+                    let h = (cell.properties.height.0 + 1.0) * 255.0 / 2.0;
+                    r = h as u8;
+                    g = h as u8;
+                    b = h as u8;
+                }
+
+                if draw_water {
+                    let w = cell.properties.water.0;
+                    r = (r as f32 * (1.0 - w)).max(0.0) as u8;
+                    g = (g as f32 * (1.0 - w)).max(0.0) as u8;
+                    if w > 0.1 {
+                        b = 255;
+                    }
+                }
+
+                if draw_air_pressure {
+                    let mut p = cell.properties.air_pressure.0 / 2.0;
+                    p = p * p * p;
+                    r = (r as f32 * (1.0 - p)).max(0.0).min(255.0) as u8;
+                    g = (g as f32 * (1.0 - p) + p * 255.0).min(255.0).max(0.0) as u8;
+                    b = (b as f32 * (1.0 - p)).max(0.0).min(255.0) as u8;
+                }
+
+                props[3 * i] = r;
+                props[3 * i + 1] = g;
+                props[3 * i + 2] = b;
             }
-            pixels
+            props
         } else {
             vec![]
         }
@@ -89,22 +116,6 @@ pub fn get_wind_directions() -> Vec<f32> {
                 directions[2 * i + 1] = *cell.properties.wind.0.xy().1;
             }
             directions
-        } else {
-            vec![]
-        }
-    }
-}
-
-#[wasm_bindgen]
-pub fn get_air_pressure() -> Vec<f32> {
-    unsafe {
-        if let Some(ref world) = current_world {
-            let (width, height) = world.size();
-            let mut pressure = vec![0.0; (width * height) as usize];
-            for (i, cell) in world.cells.iter().enumerate() {
-                pressure[i] = cell.properties.air_pressure.0;
-            }
-            pressure
         } else {
             vec![]
         }

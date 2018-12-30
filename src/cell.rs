@@ -4,9 +4,6 @@ use vec;
 use vec::Vector;
 use world;
 
-//#[derive(Copy, Clone)]
-//pub struct Gradient(pub vec::Vec2f);
-
 #[derive(Copy, Clone)]
 pub struct Height(pub f32);
 
@@ -56,21 +53,10 @@ impl Cell {
             y: self.y,
         }
     }
-
-    pub fn to_pixel(&self) -> (u8, u8, u8) {
-        let w = self.properties.water.0.min(1.0);
-        let h = utils::map_range(
-            0.0..2.0,
-            0.0..255.0,
-            (self.properties.height.0 + 1.0) * (1.0 - w),
-        );
-        return (h as u8, h as u8, if w > 0.05 { 255 } else { h as u8 });
-    }
 }
 
 #[derive(Copy, Clone)]
 pub struct CellProperties {
-    //pub gradient: Gradient,
     pub height: Height,
     pub air_pressure: AirPressure,
     pub wind: Wind,
@@ -87,7 +73,6 @@ impl CellProperties {
             waterlevel = 0.0;
         }
         CellProperties {
-            //gradient: Gradient(description.heightmap.get_gradient(x, y)),
             height: Height(description.heightmap.get(x, y)),
             air_pressure: AirPressure(1.0), //AirPressure(description.windmap.get(x, y) + 1.0),
             wind: Wind(vec::Vec2f::new(0.0, 0.0)),
@@ -103,7 +88,6 @@ impl CellProperties {
 
     fn step(current: &CellProperties, delta: f32, neighborhood: &Neighborhood) -> CellProperties {
         CellProperties {
-            //gradient: current.gradient,
             height: current.height,
             air_pressure: update_air_pressure(delta, neighborhood),
             wind: update_wind(delta, neighborhood),

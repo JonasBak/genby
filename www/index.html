@@ -7,18 +7,40 @@
   <body>
     <canvas id="canvas"></canvas>
     <div>
-      <label>
-        <input type="checkbox" id="drawWorld" />
-        Draw world
-      </label>
-      <label>
-        <input type="checkbox" id="drawWind" />
-        Draw wind
-      </label>
-      <label>
-        <input type="checkbox" id="drawAirPressure" />
-        Draw air pressure
-      </label>
+      <div>
+        <div>Draw options</div>
+        <label>
+          <input type="checkbox" id="drawHeight" />
+          Height
+        </label>
+        <label>
+          <input type="checkbox" id="drawWater" />
+          Water
+        </label>
+        <label>
+          <input type="checkbox" id="drawWind" />
+          Wind
+        </label>
+        <label>
+          <input type="checkbox" id="drawAirPressure" />
+          Air pressure
+        </label>
+      </div>
+      <div>
+        <div>Brush options</div>
+        <label>
+          Water
+          <input type="number" id="diffWater" />
+        </label>
+        <label>
+          Air pressure
+          <input type="number" id="diffAirPressure" />
+        </label>
+        <label>
+          Radius
+          <input type="number" id="radius" />
+        </label>
+      </div>
     </div>
     <script src="./bootstrap.js"></script>
   </body>

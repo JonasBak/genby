@@ -1,7 +1,8 @@
 export const config = {
-  drawWorld: true,
+  drawHeight: true,
+  drawWater: true,
   drawWind: true,
-  drawAirPressure: true,
+  drawAirPressure: false,
   cellSize: 5,
   brush: {
     radius: 15,
@@ -18,13 +19,23 @@ export const bindBrush = (canvas, func) => {
   });
 };
 
-export const bindCheckbox = (field) => {
-  const elem = document.getElementById(field);
-  elem.checked = config[field];
-
-  elem.addEventListener("change", () => config[field] = elem.checked);
+export const bindCheckbox = (id, setValue, initialValue) => {
+  const elem = document.getElementById(id);
+  elem.checked = initialValue;
+  elem.addEventListener("change", () => setValue(elem.checked));
 };
 
-bindCheckbox("drawWorld");
-bindCheckbox("drawWind");
-bindCheckbox("drawAirPressure");
+export const bindInput = (id, setValue, initialValue) => {
+  const elem = document.getElementById(id);
+  elem.value = initialValue;
+  elem.addEventListener("change", () => setValue(elem.value));
+};
+
+bindCheckbox("drawHeight", value => config.drawHeight = value, config.drawHeight);
+bindCheckbox("drawWater", value => config.drawWater = value, config.drawWater);
+bindCheckbox("drawWind", value => config.drawWind = value, config.drawWind);
+bindCheckbox("drawAirPressure", value => config.drawAirPressure = value, config.drawAirPressure);
+
+bindInput("diffWater", value => config.brush.diffWater = value, config.brush.diffWater);
+bindInput("diffAirPressure", value => config.brush.diffAirPressure = value, config.brush.diffAirPressure);
+bindInput("radius", value => config.brush.radius = value, config.brush.radius);

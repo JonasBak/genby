@@ -65,11 +65,14 @@ function getArrayU8FromWasm(ptr, len) {
     return getUint8Memory().subarray(ptr / 1, ptr / 1 + len);
 }
 /**
+* @param {boolean} arg0
+* @param {boolean} arg1
+* @param {boolean} arg2
 * @returns {Uint8Array}
 */
-export function get_pixels() {
+export function get_pixels(arg0, arg1, arg2) {
     const retptr = globalArgumentPtr();
-    wasm.get_pixels(retptr);
+    wasm.get_pixels(retptr, arg0, arg1, arg2);
     const mem = getUint32Memory();
     const rustptr = mem[retptr / 4];
     const rustlen = mem[retptr / 4 + 1];
@@ -97,22 +100,6 @@ function getArrayF32FromWasm(ptr, len) {
 export function get_wind_directions() {
     const retptr = globalArgumentPtr();
     wasm.get_wind_directions(retptr);
-    const mem = getUint32Memory();
-    const rustptr = mem[retptr / 4];
-    const rustlen = mem[retptr / 4 + 1];
-
-    const realRet = getArrayF32FromWasm(rustptr, rustlen).slice();
-    wasm.__wbindgen_free(rustptr, rustlen * 4);
-    return realRet;
-
-}
-
-/**
-* @returns {Float32Array}
-*/
-export function get_air_pressure() {
-    const retptr = globalArgumentPtr();
-    wasm.get_air_pressure(retptr);
     const mem = getUint32Memory();
     const rustptr = mem[retptr / 4];
     const rustlen = mem[retptr / 4 + 1];
