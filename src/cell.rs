@@ -138,25 +138,51 @@ fn update_wind(delta: f32, neighborhood: &Neighborhood) -> Wind {
     ))
 }
 
-fn water_diff(me: CellProperties, close: CellProperties) -> f32 {
-    if close.total_height() > me.total_height() {
-        close.water.0.min(close.total_height() - me.total_height())
+fn water_diff(me: CellProperties, close: CellProperties, wind: f32) -> f32 {
+    let wind_factor = 0.1;
+
+    if close.total_height() + wind_factor * wind > me.total_height() {
+        close
+            .water
+            .0
+            .min((close.total_height() + wind_factor * wind - me.total_height()).max(0.0))
     } else {
-        -me.water.0.min(-close.total_height() + me.total_height())
+        -me.water
+            .0
+            .min((-close.total_height() - wind_factor * wind + me.total_height()).max(0.0))
     }
 }
 
 fn update_water(delta: f32, neighborhood: &Neighborhood) -> Water {
     let water_propagation_factor = 1.0;
 
-    let diff_up = water_diff(neighborhood.me, neighborhood.up);
-    let diff_down = water_diff(neighborhood.me, neighborhood.down);
-    let diff_left = water_diff(neighborhood.me, neighborhood.left);
-    let diff_right = water_diff(neighborhood.me, neighborhood.right);
+    let (wind_x, wind_y) = neighborhood.me.wind.0.xy();
+
+    let diff_up = water_diff(
+        neighborhood.me,
+        neighborhood.up,
+        -neighborhood.up.wind.0.xy().1 - wind_y,
+    );
+    let diff_down = water_diff(
+        neighborhood.me,
+        neighborhood.down,
+        *neighborhood.down.wind.0.xy().1 + wind_y,
+    );
+    let diff_left = water_diff(
+        neighborhood.me,
+        neighborhood.left,
+        *neighborhood.left.wind.0.xy().0 + wind_x,
+    );
+    let diff_right = water_diff(
+        neighborhood.me,
+        neighborhood.right,
+        -neighborhood.right.wind.0.xy().0 - wind_x,
+    );
 
     Water(
-        neighborhood.me.water.0
-            + delta * water_propagation_factor * (diff_up + diff_down + diff_left + diff_right),
+        (neighborhood.me.water.0
+            + delta * water_propagation_factor * (diff_up + diff_down + diff_left + diff_right))
+            .max(0.0),
     )
 }
 
