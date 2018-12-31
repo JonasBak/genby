@@ -11,7 +11,7 @@ pub struct World {
 
 pub struct WorldDescription {
     pub heightmap: perlin::Noise,
-    pub windmap: perlin::Noise,
+    pub heatmap: perlin::Noise,
     pub waterlevel: perlin::Noise,
 }
 
@@ -19,7 +19,7 @@ impl World {
     pub fn new(grid: u32, size: u32) -> World {
         let description = WorldDescription {
             heightmap: perlin::Grid::new(grid, grid).generate_noise(size / grid),
-            windmap: perlin::Grid::new(grid, grid).generate_noise(size / grid),
+            heatmap: perlin::Grid::new(grid, grid).generate_noise(size / grid),
             waterlevel: perlin::Grid::new(grid, grid).generate_noise(size / grid),
         };
         World {

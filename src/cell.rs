@@ -67,17 +67,14 @@ pub struct CellProperties {
 
 impl CellProperties {
     fn new(description: &world::WorldDescription, x: u32, y: u32) -> CellProperties {
-        let mut waterlevel =
-            description.waterlevel.get(x, y) - 0.1 - description.heightmap.get(x, y);
-        if waterlevel < 0.0 {
-            waterlevel = 0.0;
-        }
+        let waterlevel =
+            (description.waterlevel.get(x, y) - 0.1 - description.heightmap.get(x, y)).max(0.0);
         CellProperties {
             height: Height(description.heightmap.get(x, y)),
-            air_pressure: AirPressure(1.0), //AirPressure(description.windmap.get(x, y) + 1.0),
+            air_pressure: AirPressure(1.0),
             wind: Wind(vec::Vec2f::new(0.0, 0.0)),
             water: Water(waterlevel),
-            heat: Heat(0.0),
+            heat: Heat(description.heightmap.get(x, y)),
             resources: Resources(0.0),
         }
     }
@@ -107,7 +104,7 @@ impl CellProperties {
 }
 
 fn update_air_pressure(delta: f32, neighborhood: &Neighborhood) -> AirPressure {
-    let propagation_factor = 0.3;
+    let air_propagation_factor = 0.3;
 
     let diff_down = neighborhood.down.wind.0.get(1);
     let diff_up = -neighborhood.up.wind.0.get(1);
@@ -116,11 +113,12 @@ fn update_air_pressure(delta: f32, neighborhood: &Neighborhood) -> AirPressure {
 
     AirPressure(
         neighborhood.me.air_pressure.0
-            + delta * propagation_factor * (diff_down + diff_up + diff_left + diff_right),
+            + delta * air_propagation_factor * (diff_down + diff_up + diff_left + diff_right),
     )
 }
 
 fn update_wind(delta: f32, neighborhood: &Neighborhood) -> Wind {
+    let wind_propagation_factor = 1.0;
     let gravity_factor = 0.2;
 
     let diff_down = neighborhood.down.air_pressure.0 - neighborhood.me.air_pressure.0
@@ -135,8 +133,8 @@ fn update_wind(delta: f32, neighborhood: &Neighborhood) -> Wind {
     let (current_x, current_y) = neighborhood.me.wind.0.xy();
 
     Wind(vec::Vec2f::new(
-        current_x + delta * (diff_left - diff_right - current_x),
-        current_y + delta * (diff_down - diff_up - current_y),
+        current_x + delta * wind_propagation_factor * (diff_left - diff_right - current_x),
+        current_y + delta * wind_propagation_factor * (diff_down - diff_up - current_y),
     ))
 }
 
@@ -149,16 +147,38 @@ fn water_diff(me: CellProperties, close: CellProperties) -> f32 {
 }
 
 fn update_water(delta: f32, neighborhood: &Neighborhood) -> Water {
+    let water_propagation_factor = 1.0;
+
     let diff_up = water_diff(neighborhood.me, neighborhood.up);
     let diff_down = water_diff(neighborhood.me, neighborhood.down);
     let diff_left = water_diff(neighborhood.me, neighborhood.left);
     let diff_right = water_diff(neighborhood.me, neighborhood.right);
 
-    Water(neighborhood.me.water.0 + delta * (diff_up + diff_down + diff_left + diff_right))
+    Water(
+        neighborhood.me.water.0
+            + delta * water_propagation_factor * (diff_up + diff_down + diff_left + diff_right),
+    )
 }
 
 fn update_heat(delta: f32, neighborhood: &Neighborhood) -> Heat {
-    Heat(0.0)
+    let heat_propagation_factor = 1.0;
+    let gravity_factor = 0.2;
+    let wind_factor = 1.0;
+
+    let diff_down = neighborhood.down.heat.0 + neighborhood.down.total_height() * gravity_factor;
+    let diff_up = neighborhood.up.heat.0 + neighborhood.up.total_height() * gravity_factor;
+    let diff_left = neighborhood.left.heat.0 + neighborhood.left.total_height() * gravity_factor;
+    let diff_right = neighborhood.right.heat.0 + neighborhood.right.total_height() * gravity_factor;
+
+    Heat(
+        neighborhood.me.heat.0
+            + delta
+                * heat_propagation_factor
+                * (diff_down + diff_up + diff_left + diff_right
+                    - 4.0
+                        * (neighborhood.me.heat.0
+                            + neighborhood.me.total_height() * gravity_factor)),
+    )
 }
 
 fn update_resources(delta: f32, neighborhood: &Neighborhood) -> Resources {

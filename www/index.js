@@ -47,9 +47,10 @@ const drawWind = winds => {
 
 const loop = () => {
   ctx.clearRect(0,0,config.cellSize*worldSize[0], config.cellSize*worldSize[1]);
-  wasm.tick(0.2);
-  wasm.tick(0.2);
-  wasm.tick(0.2);
+  wasm.tick(0.1);
+  wasm.tick(0.1);
+  wasm.tick(0.1);
+  wasm.tick(0.1);
   drawWorld(wasm.get_pixels(config.drawHeight, config.drawWater, config.drawAirPressure));
   drawWind(wasm.get_wind_directions());
   requestAnimationFrame(loop);
