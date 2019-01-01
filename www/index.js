@@ -40,6 +40,8 @@ const drawWind = winds => {
       
     }
   }
+
+  ctx.strokeStyle = "#A00";
   ctx.stroke();
   ctx.closePath();
 

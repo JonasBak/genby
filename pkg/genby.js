@@ -116,10 +116,11 @@ export function get_wind_directions() {
 * @param {number} arg2
 * @param {number} arg3
 * @param {number} arg4
+* @param {number} arg5
 * @returns {void}
 */
-export function alter_world(arg0, arg1, arg2, arg3, arg4) {
-    return wasm.alter_world(arg0, arg1, arg2, arg3, arg4);
+export function alter_world(arg0, arg1, arg2, arg3, arg4, arg5) {
+    return wasm.alter_world(arg0, arg1, arg2, arg3, arg4, arg5);
 }
 
 export function __wbg_random_2cc0c8d054a5c72a() {

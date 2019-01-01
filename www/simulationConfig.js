@@ -7,7 +7,8 @@ export const config = {
   brush: {
     radius: 15,
     diffWater: 0.8,
-    diffAirPressure: 0
+    diffAirPressure: 0,
+    diffHeight: 0
   }
 };
 
@@ -15,7 +16,7 @@ export const bindBrush = (canvas, func) => {
   canvas.addEventListener("click", e => {
     const x = e.layerX/config.cellSize;
     const y = e.layerY/config.cellSize;
-    func(x, y, config.brush.radius, config.brush.diffWater, config.brush.diffAirPressure);
+    func(x, y, config.brush.radius, config.brush.diffWater, config.brush.diffAirPressure, config.brush.diffHeight);
   });
 };
 
@@ -38,4 +39,5 @@ bindCheckbox("drawAirPressure", value => config.drawAirPressure = value, config.
 
 bindInput("diffWater", value => config.brush.diffWater = value, config.brush.diffWater);
 bindInput("diffAirPressure", value => config.brush.diffAirPressure = value, config.brush.diffAirPressure);
+bindInput("diffHeight", value => config.brush.diffHeight = value, config.brush.diffHeight);
 bindInput("radius", value => config.brush.radius = value, config.brush.radius);

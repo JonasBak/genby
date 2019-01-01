@@ -94,10 +94,16 @@ impl CellProperties {
         }
     }
 
-    pub fn alter_properties(&self, d_water: f32, d_air_pressure: f32) -> CellProperties {
+    pub fn alter_properties(
+        &self,
+        d_water: f32,
+        d_air_pressure: f32,
+        d_height: f32,
+    ) -> CellProperties {
         CellProperties {
             water: Water((self.water.0 + d_water).max(0.0)),
-            air_pressure: AirPressure(self.air_pressure.0 + d_air_pressure),
+            air_pressure: AirPressure((self.air_pressure.0 + d_air_pressure).max(0.0)),
+            height: Height((self.height.0 + d_height).min(1.0).max(-1.0)),
             ..*self
         }
     }
@@ -117,18 +123,35 @@ fn update_air_pressure(delta: f32, neighborhood: &Neighborhood) -> AirPressure {
     )
 }
 
+fn air_pressure_diff(me: CellProperties, close: CellProperties) -> f32 {
+    let gravity_factor = 0.5;
+
+    if close.total_height() * gravity_factor + close.air_pressure.0
+        > me.total_height() * gravity_factor + me.air_pressure.0
+    {
+        close.air_pressure.0.min(
+            (close.total_height() * gravity_factor + close.air_pressure.0
+                - me.total_height() * gravity_factor
+                - me.air_pressure.0)
+                .max(0.0),
+        )
+    } else {
+        -me.air_pressure.0.min(
+            (-close.total_height() * gravity_factor - close.air_pressure.0
+                + me.total_height() * gravity_factor
+                + me.air_pressure.0)
+                .max(0.0),
+        )
+    }
+}
+
 fn update_wind(delta: f32, neighborhood: &Neighborhood) -> Wind {
     let wind_propagation_factor = 1.0;
-    let gravity_factor = 0.2;
 
-    let diff_down = neighborhood.down.air_pressure.0 - neighborhood.me.air_pressure.0
-        + (neighborhood.down.total_height() - neighborhood.me.total_height()) * gravity_factor;
-    let diff_up = neighborhood.up.air_pressure.0 - neighborhood.me.air_pressure.0
-        + (neighborhood.up.total_height() - neighborhood.me.total_height()) * gravity_factor;
-    let diff_left = neighborhood.left.air_pressure.0 - neighborhood.me.air_pressure.0
-        + (neighborhood.left.total_height() - neighborhood.me.total_height()) * gravity_factor;
-    let diff_right = neighborhood.right.air_pressure.0 - neighborhood.me.air_pressure.0
-        + (neighborhood.right.total_height() - neighborhood.me.total_height()) * gravity_factor;
+    let diff_up = air_pressure_diff(neighborhood.me, neighborhood.up);
+    let diff_down = air_pressure_diff(neighborhood.me, neighborhood.down);
+    let diff_left = air_pressure_diff(neighborhood.me, neighborhood.left);
+    let diff_right = air_pressure_diff(neighborhood.me, neighborhood.right);
 
     let (current_x, current_y) = neighborhood.me.wind.0.xy();
 

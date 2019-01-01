@@ -123,14 +123,22 @@ pub fn get_wind_directions() -> Vec<f32> {
 }
 
 #[wasm_bindgen]
-pub fn alter_world(center_x: u32, center_y: u32, radius: u32, d_water: f32, d_air_pressure: f32) {
+pub fn alter_world(
+    center_x: u32,
+    center_y: u32,
+    radius: u32,
+    d_water: f32,
+    d_air_pressure: f32,
+    d_height: f32,
+) {
     unsafe {
         if let Some(ref mut world) = current_world {
             let indices = world.select_cells((center_x, center_y), radius);
             for i in indices.iter() {
-                world.cells[*i].properties = world.cells[*i]
-                    .properties
-                    .alter_properties(d_water, d_air_pressure);
+                world.cells[*i].properties =
+                    world.cells[*i]
+                        .properties
+                        .alter_properties(d_water, d_air_pressure, d_height);
             }
         }
     }
