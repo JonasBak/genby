@@ -8,6 +8,9 @@ use world;
 pub struct Height(pub f32);
 
 #[derive(Copy, Clone)]
+pub struct Gradient(pub vec::Vec2f);
+
+#[derive(Copy, Clone)]
 pub struct AirPressure(pub f32);
 
 #[derive(Copy, Clone)]
@@ -28,6 +31,15 @@ pub struct Neighborhood {
     pub left: CellProperties,
     pub right: CellProperties,
     pub me: CellProperties,
+}
+
+impl Neighborhood {
+    pub fn get_gradient(&self) -> vec::Vec2f {
+        vec::Vec2f::new(
+            (self.right.height.0 - self.left.height.0) / 2.0,
+            (self.up.height.0 - self.down.height.0) / 2.0,
+        )
+    }
 }
 
 pub struct Cell {
@@ -58,6 +70,7 @@ impl Cell {
 #[derive(Copy, Clone)]
 pub struct CellProperties {
     pub height: Height,
+    pub gradient: Gradient,
     pub air_pressure: AirPressure,
     pub wind: Wind,
     pub water: Water,
@@ -71,6 +84,7 @@ impl CellProperties {
             (description.waterlevel.get(x, y) - 0.1 - description.heightmap.get(x, y)).max(0.0);
         CellProperties {
             height: Height(description.heightmap.get(x, y)),
+            gradient: Gradient(vec::Vec2f::new(0.0, 0.0)),
             air_pressure: AirPressure(1.0),
             wind: Wind(vec::Vec2f::new(0.0, 0.0)),
             water: Water(waterlevel),
@@ -86,6 +100,7 @@ impl CellProperties {
     fn step(current: &CellProperties, delta: f32, neighborhood: &Neighborhood) -> CellProperties {
         CellProperties {
             height: current.height,
+            gradient: Gradient(neighborhood.get_gradient()),
             air_pressure: update_air_pressure(delta, neighborhood),
             wind: update_wind(delta, neighborhood),
             water: update_water(delta, neighborhood),
@@ -110,7 +125,7 @@ impl CellProperties {
 }
 
 fn update_air_pressure(delta: f32, neighborhood: &Neighborhood) -> AirPressure {
-    let air_propagation_factor = 0.3;
+    let air_propagation_factor = 0.5;
 
     let diff_down = neighborhood.down.wind.0.get(1);
     let diff_up = -neighborhood.up.wind.0.get(1);
@@ -146,7 +161,7 @@ fn air_pressure_diff(me: CellProperties, close: CellProperties) -> f32 {
 }
 
 fn update_wind(delta: f32, neighborhood: &Neighborhood) -> Wind {
-    let wind_propagation_factor = 1.0;
+    let wind_propagation_factor = 0.25;
 
     let diff_up = air_pressure_diff(neighborhood.me, neighborhood.up);
     let diff_down = air_pressure_diff(neighborhood.me, neighborhood.down);

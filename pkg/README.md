@@ -1,6 +1,8 @@
 # genby
 Using rust to simulate an environment, visualized in js by compiling rust to wasm.
 
+[Example](http://jonasbak.github.io/genby/example-build/index)
+
 ## Setup
 Requires `rustup`, `rustc`, `cargo`, `wasm-pack` and `yarn`
 

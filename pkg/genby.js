@@ -68,11 +68,12 @@ function getArrayU8FromWasm(ptr, len) {
 * @param {boolean} arg0
 * @param {boolean} arg1
 * @param {boolean} arg2
+* @param {boolean} arg3
 * @returns {Uint8Array}
 */
-export function get_pixels(arg0, arg1, arg2) {
+export function get_pixels(arg0, arg1, arg2, arg3) {
     const retptr = globalArgumentPtr();
-    wasm.get_pixels(retptr, arg0, arg1, arg2);
+    wasm.get_pixels(retptr, arg0, arg1, arg2, arg3);
     const mem = getUint32Memory();
     const rustptr = mem[retptr / 4];
     const rustlen = mem[retptr / 4 + 1];

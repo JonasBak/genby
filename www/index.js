@@ -56,7 +56,7 @@ const loop = () => {
   wasm.tick(0.1);
   wasm.tick(0.1);
   wasm.tick(0.1);
-  drawWorld(wasm.get_pixels(config.drawHeight, config.drawWater, config.drawAirPressure));
+  drawWorld(wasm.get_pixels(config.drawHeight, config.drawWater, config.drawAirPressure, config.drawBiomes));
   if (config.drawWind)
     drawWind(wasm.get_wind_directions());
   requestAnimationFrame(loop);

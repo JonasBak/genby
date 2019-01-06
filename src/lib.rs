@@ -5,6 +5,7 @@ extern crate image;
 extern crate js_sys;
 extern crate wasm_bindgen;
 
+mod biome;
 mod cell;
 mod perlin;
 mod utils;
@@ -34,7 +35,7 @@ extern "C" {
 #[wasm_bindgen]
 pub fn create(x: f32, y: f32) {
     unsafe {
-        current_world = Some(world::World::new(5, 100));
+        current_world = Some(world::World::new(4, 100));
     }
 }
 
@@ -60,7 +61,12 @@ pub fn size() -> Vec<u32> {
 }
 
 #[wasm_bindgen]
-pub fn get_pixels(draw_height: bool, draw_water: bool, draw_air_pressure: bool) -> Vec<u8> {
+pub fn get_pixels(
+    draw_height: bool,
+    draw_water: bool,
+    draw_air_pressure: bool,
+    draw_biomes: bool,
+) -> Vec<u8> {
     unsafe {
         if let Some(ref world) = current_world {
             let (width, height) = world.size();
@@ -81,7 +87,7 @@ pub fn get_pixels(draw_height: bool, draw_water: bool, draw_air_pressure: bool) 
                     let w = cell.properties.water.0;
                     r = (r as f32 * (1.0 - w)).max(0.0) as u8;
                     g = (g as f32 * (1.0 - w)).max(0.0) as u8;
-                    if w > 0.001 {
+                    if w > 0.05 {
                         b = 255;
                     }
                 }
@@ -92,6 +98,13 @@ pub fn get_pixels(draw_height: bool, draw_water: bool, draw_air_pressure: bool) 
                     r = (r as f32 * (1.0 - p)).max(0.0).min(255.0) as u8;
                     g = (g as f32 * (1.0 - p) + p * 255.0).min(255.0).max(0.0) as u8;
                     b = (b as f32 * (1.0 - p)).max(0.0).min(255.0) as u8;
+                }
+
+                if draw_biomes {
+                    let (br, bg, bb) = biome::tmp_colors(biome::classify_cell(cell.properties));
+                    r = br;
+                    g = bg;
+                    b = bb;
                 }
 
                 props[3 * i] = r;

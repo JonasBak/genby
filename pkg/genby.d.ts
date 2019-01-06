@@ -5,7 +5,7 @@ export function tick(arg0: number): void;
 
 export function size(): Uint32Array;
 
-export function get_pixels(arg0: boolean, arg1: boolean, arg2: boolean): Uint8Array;
+export function get_pixels(arg0: boolean, arg1: boolean, arg2: boolean, arg3: boolean): Uint8Array;
 
 export function get_wind_directions(): Float32Array;
 

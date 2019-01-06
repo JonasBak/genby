@@ -2,12 +2,13 @@ export const config = {
   drawHeight: true,
   drawWater: true,
   drawWind: true,
-  drawAirPressure: false,
+  drawAirPressure: true,
+  drawBiomes: false,
   cellSize: 5,
   brush: {
     radius: 15,
-    diffWater: 0.8,
-    diffAirPressure: 0,
+    diffWater: 0,
+    diffAirPressure: 1,
     diffHeight: 0
   }
 };
@@ -36,6 +37,7 @@ bindCheckbox("drawHeight", value => config.drawHeight = value, config.drawHeight
 bindCheckbox("drawWater", value => config.drawWater = value, config.drawWater);
 bindCheckbox("drawWind", value => config.drawWind = value, config.drawWind);
 bindCheckbox("drawAirPressure", value => config.drawAirPressure = value, config.drawAirPressure);
+bindCheckbox("drawBiomes", value => config.drawBiomes = value, config.drawBiomes);
 
 bindInput("diffWater", value => config.brush.diffWater = value, config.brush.diffWater);
 bindInput("diffAirPressure", value => config.brush.diffAirPressure = value, config.brush.diffAirPressure);
