@@ -2,7 +2,7 @@ import * as wasm from "genby";
 import {config, bindBrush} from "./simulationConfig";
 
 const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+//const ctx = canvas.getContext("2d");
 
 wasm.create();
 const worldSize = wasm.size()
@@ -10,46 +10,77 @@ const worldSize = wasm.size()
 canvas.width = config.cellSize * worldSize[0];
 canvas.height = config.cellSize * worldSize[1];
 
+const gl = canvas.getContext("webgl");
+
+const shaders = new Shader();
+shaders.init(gl);
+const scene = new Scene(canvas, gl, shaders);
+const va = new VertexArray(gl, shaders);
+scene.vas.push(va);
+
+scene.camera.cameraTranslation = [-worldSize[0] / 2.0,-100,-worldSize[1]];
+scene.camera.direction = [0, -2, -1];
+scene.camera.zFar = 300;
+
+
+//scene.light = new DirectionalLight(
+//			vec3.normalize(vec3.create(), vec3.fromValues(1, -2, 3)),
+//      vec3.fromValues(1, 1, 1),
+//      1,
+//      2,
+//      0
+//    );
+
 bindBrush(canvas, wasm.alter_world);
 
-const drawWorld = pixels => {
-  for (let x = 0; x < worldSize[0]; x++) {
-    for (let y = 0; y < worldSize[1]; y++) {
-      let i = y * worldSize[0] + x;
-      const r = pixels[3*i];
-      const g = pixels[3*i+1];
-      const b = pixels[3*i+2];
-      ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
-      ctx.fillRect(x*config.cellSize, y * config.cellSize, config.cellSize, config.cellSize);
-    }
-  }
-};
+const pushVertex = (pixels, heights, i, x, y, normal) => {
+  const r = pixels[3*i]/255;
+  const g = pixels[3*i+1]/255;
+  const b = pixels[3*i+2]/255;
+  const height = heights[i];
+  va.makeVertex([x , height * 10,y], [r, g, b], normal);
+}
 
-const drawWind = winds => {
-  ctx.beginPath();
-  for (let x = 1; x < 20; x++) {
-    for (let y = 1; y < 20; y++) {
-      const x0 = x * (worldSize[0]/ 20);
-      const y0 = y * (worldSize[1]/ 20);
-      let i = y0  * worldSize[0] + x0;
+const generateSquare = (pixels, heights, x, y, top) => {
+  const x1 = x + 1;
+  const y1 = top ? y+1 : y;
+  const x2 = top ? x : x+1;
+  const y2 = y + 1;
+  
+  const normal = vec3.normalize(vec3.create(), vec3.cross(
+        vec3.create(),
+        vec3.sub(vec3.create(), [x2, heights[y2 * worldSize[0] + x2] * 10, y2], [x, heights[y * worldSize[0] + x] * 10, y]),
+        vec3.sub(vec3.create(), [x1, heights[y1 * worldSize[0] + x1] * 10, y1], [x, heights[y * worldSize[0] + x] * 10, y]),
+      ));
 
-      const windFactor = 500;
-
-      ctx.moveTo(x0 * config.cellSize, y0 * config.cellSize);
-      ctx.lineTo(x0 * config.cellSize + winds[2*i ] * windFactor, y0 * config.cellSize + winds[2*i + 1] * windFactor);
-      
-    }
-  }
-
-  ctx.strokeStyle = "#A00";
-  ctx.stroke();
-  ctx.closePath();
+  pushVertex(pixels, heights, y * worldSize[0] + x, x, y, normal);
+  pushVertex(pixels, heights, y1 * worldSize[0] + x1, x1, y1, normal);
+  pushVertex(pixels, heights, y2 * worldSize[0] + x2, x2, y2, normal);
 
 }
 
+const generateVa = (pixels, heights) => {
+  va.vertexArray = [];
+  for (let x = 0; x < worldSize[0] - 1; x++) {
+    for (let y = 0; y < worldSize[1] - 1; y++) {
+      generateSquare(pixels, heights, x, y, true);
+      generateSquare(pixels, heights, x, y, false);
+    }
+  }
+}
+
+const drawWorld = pixels => {
+  scene.update();
+
+  scene.draw(gl, shaders);
+};
+
+const drawWind = winds => {
+}
+
 const loop = () => {
-  ctx.clearRect(0,0,config.cellSize*worldSize[0], config.cellSize*worldSize[1]);
   wasm.tick(0.25);
+  generateVa(wasm.get_pixels(config.drawHeight, config.drawWater, config.drawAirPressure, config.drawBiomes), wasm.get_heights(config.drawWater));
   drawWorld(wasm.get_pixels(config.drawHeight, config.drawWater, config.drawAirPressure, config.drawBiomes));
   if (config.drawWind)
     drawWind(wasm.get_wind_directions());

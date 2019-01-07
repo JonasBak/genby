@@ -72,9 +72,9 @@ pub fn get_pixels(
             let (width, height) = world.size();
             let mut props = vec![0; (width * height * 3) as usize];
             for (i, cell) in world.cells.iter().enumerate() {
-                let mut r = 0;
-                let mut g = 0;
-                let mut b = 0;
+                let mut r = 125;
+                let mut g = 125;
+                let mut b = 125;
 
                 if draw_height {
                     let h = (cell.properties.height.0 + 1.0) * 255.0 / 2.0;
@@ -112,6 +112,26 @@ pub fn get_pixels(
                 props[3 * i + 2] = b;
             }
             props
+        } else {
+            vec![]
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub fn get_heights(with_water: bool) -> Vec<f32> {
+    unsafe {
+        if let Some(ref world) = current_world {
+            let (width, height) = world.size();
+            let mut heights = vec![0.0; (width * height) as usize];
+            for (i, cell) in world.cells.iter().enumerate() {
+                if with_water {
+                    heights[i] = cell.properties.total_height();
+                } else {
+                    heights[i] = cell.properties.height.0;
+                };
+            }
+            heights
         } else {
             vec![]
         }

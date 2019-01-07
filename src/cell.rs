@@ -98,7 +98,7 @@ impl CellProperties {
         }
     }
 
-    fn total_height(&self) -> f32 {
+    pub fn total_height(&self) -> f32 {
         self.height.0 + self.water.0
     }
 

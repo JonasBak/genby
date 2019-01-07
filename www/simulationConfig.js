@@ -1,14 +1,14 @@
 export const config = {
-  drawHeight: true,
-  drawWater: true,
-  drawWind: true,
-  drawAirPressure: true,
+  drawHeight: false,
+  drawWater: false,
+  drawWind: false,
+  drawAirPressure: false,
   drawBiomes: false,
   cellSize: 5,
   brush: {
     radius: 15,
     diffWater: 0,
-    diffAirPressure: 1,
+    diffAirPressure: 0,
     diffHeight: 0
   }
 };
