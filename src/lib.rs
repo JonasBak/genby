@@ -101,7 +101,7 @@ pub fn get_pixels(
                 }
 
                 if draw_biomes {
-                    let (br, bg, bb) = biome::tmp_colors(biome::classify_cell(cell.properties));
+                    let (br, bg, bb) = biome::tmp_colors(biome::classify_tags(cell.biome_tags));
                     r = br;
                     g = bg;
                     b = bb;

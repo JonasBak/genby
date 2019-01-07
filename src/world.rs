@@ -1,3 +1,4 @@
+use biome;
 use cell;
 #[allow(dead_code)]
 use perlin;
@@ -62,6 +63,8 @@ impl World {
 
     pub fn update(&mut self, delta: f32) {
         let mut updated_cells = vec![];
+        let mut lake_indices = vec![];
+        let mut mountain_indices = vec![];
         for i in 0..self.cells.len() {
             let p = (i as u32 % self.width, i as u32 / self.height);
             let p0 = (
@@ -77,7 +80,13 @@ impl World {
                 me: self.cells[i].properties,
             };
             updated_cells.push(self.cells[i].update(delta, &neighborhood));
+            match biome::classify_tags(updated_cells[i].biome_tags) {
+                biome::BiomeType::Lake => lake_indices.push(i),
+                biome::BiomeType::Mountain => mountain_indices.push(i),
+                _ => (),
+            };
         }
+        biome::update_biomes(delta, &mut updated_cells, lake_indices, mountain_indices);
         self.cells = updated_cells;
     }
 

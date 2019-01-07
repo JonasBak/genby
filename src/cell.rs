@@ -1,3 +1,4 @@
+use biome;
 #[allow(dead_code)]
 use utils;
 use vec;
@@ -44,14 +45,17 @@ impl Neighborhood {
 
 pub struct Cell {
     pub properties: CellProperties,
+    pub biome_tags: biome::BiomeTags,
     pub x: u32,
     pub y: u32,
 }
 
 impl Cell {
     pub fn new(description: &world::WorldDescription, x: u32, y: u32) -> Cell {
+        let properties = CellProperties::new(description, x, y);
         Cell {
-            properties: CellProperties::new(description, x, y),
+            properties: properties,
+            biome_tags: biome::tag_cell(&properties),
             x: x,
             y: y,
         }
@@ -61,6 +65,7 @@ impl Cell {
         let new_props = CellProperties::step(&self.properties, delta, neighborhood);
         Cell {
             properties: new_props,
+            biome_tags: biome::tag_cell(&new_props),
             x: self.x,
             y: self.y,
         }
