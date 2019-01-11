@@ -96,6 +96,23 @@ function getArrayF32FromWasm(ptr, len) {
     return getFloat32Memory().subarray(ptr / 4, ptr / 4 + len);
 }
 /**
+* @param {boolean} arg0
+* @returns {Float32Array}
+*/
+export function get_heights(arg0) {
+    const retptr = globalArgumentPtr();
+    wasm.get_heights(retptr, arg0);
+    const mem = getUint32Memory();
+    const rustptr = mem[retptr / 4];
+    const rustlen = mem[retptr / 4 + 1];
+
+    const realRet = getArrayF32FromWasm(rustptr, rustlen).slice();
+    wasm.__wbindgen_free(rustptr, rustlen * 4);
+    return realRet;
+
+}
+
+/**
 * @returns {Float32Array}
 */
 export function get_wind_directions() {
