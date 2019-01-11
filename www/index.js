@@ -49,7 +49,9 @@ const drawWind = winds => {
 
 const loop = () => {
   ctx.clearRect(0,0,config.cellSize*worldSize[0], config.cellSize*worldSize[1]);
-  wasm.tick(0.25);
+  wasm.tick(0.1);
+  wasm.tick(0.1);
+  wasm.tick(0.05);
   drawWorld(wasm.get_pixels(config.drawHeight, config.drawWater, config.drawAirPressure, config.drawBiomes));
   if (config.drawWind)
     drawWind(wasm.get_wind_directions());

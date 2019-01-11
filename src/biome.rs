@@ -1,7 +1,7 @@
 use cell;
 use vec;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum BiomeType {
     Lake,
     Forest,
@@ -72,23 +72,34 @@ pub fn tmp_colors(biome: BiomeType) -> (u8, u8, u8) {
     }
 }
 
-pub fn update_biomes(
-    delta: f32,
-    cells: &mut Vec<cell::Cell>,
-    lake_indices: Vec<usize>,
-    mountain_indices: Vec<usize>,
-) {
-    let evaporation_factor = 0.0001;
+pub fn update_biomes(delta: f32, mut cells: Vec<cell::Cell>) -> Vec<cell::Cell> {
+    let evaporation_factor = 0.0005;
     let mut water_vapor = 0.0;
-    for i in lake_indices {
-        cells[i].properties =
-            cells[i]
-                .properties
-                .alter_properties(-evaporation_factor * delta, 0.0, 0.0);
-        water_vapor += evaporation_factor * delta;
+    let mut n_mountain = 0;
+    for mut cell in cells.iter_mut() {
+        match classify_tags(cell.biome_tags) {
+            BiomeType::Lake => {
+                cell.properties =
+                    cell.properties
+                        .alter_properties(-evaporation_factor * delta, 0.0, 0.0);
+                water_vapor += evaporation_factor * delta;
+            }
+            BiomeType::Mountain => {
+                n_mountain += 1;
+            }
+            _ => (),
+        };
     }
-    let rain = water_vapor / mountain_indices.len() as f32;
-    for i in mountain_indices {
-        cells[i].properties = cells[i].properties.alter_properties(rain, 0.0, 0.0);
+    let rain = water_vapor / n_mountain as f32;
+    for mut cell in cells.iter_mut() {
+        match classify_tags(cell.biome_tags) {
+            BiomeType::Mountain => {
+                cell.properties = cell.properties.alter_properties(rain, 0.0, 0.0);
+                water_vapor += evaporation_factor * delta;
+            }
+            _ => (),
+        };
     }
+
+    cells
 }
