@@ -1,6 +1,6 @@
 export const config = {
   drawHeight: false,
-  drawWater: false,
+  drawWater: true,
   drawWind: false,
   drawAirPressure: false,
   drawBiomes: false,

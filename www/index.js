@@ -1,4 +1,5 @@
 import * as wasm from "genby";
+import {vec3, Scene, Shader, VertexArray} from "webglfw";
 import {config, bindBrush} from "./simulationConfig";
 
 const canvas = document.getElementById("canvas");
