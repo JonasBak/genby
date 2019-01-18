@@ -73,7 +73,7 @@ pub fn tmp_colors(biome: BiomeType) -> (u8, u8, u8) {
 }
 
 pub fn update_biomes(delta: f32, mut cells: Vec<cell::Cell>) -> Vec<cell::Cell> {
-    let evaporation_factor = 0.0005;
+    let evaporation_factor = 0.000005;
     let mut water_vapor = 0.0;
     let mut n_mountain = 0;
     for mut cell in cells.iter_mut() {

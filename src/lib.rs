@@ -86,10 +86,8 @@ pub fn get_pixels(
                 if draw_water {
                     let w = cell.properties.water.0;
                     r = (r as f32 * (1.0 - w)).max(0.0) as u8;
+                    b = (b as f32 * (1.0 - w) + 255.0 * w * 5.0).max(0.0).min(255.0) as u8;
                     g = (g as f32 * (1.0 - w)).max(0.0) as u8;
-                    if w > 0.05 {
-                        b = 255;
-                    }
                 }
 
                 if draw_air_pressure {

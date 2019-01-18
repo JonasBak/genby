@@ -71,7 +71,7 @@ const drawWind = winds => {
 }
 
 const loop = () => {
-  wasm.tick(0.25);
+  wasm.tick(0.2);
   generateVa(wasm.get_pixels(config.drawHeight, config.drawWater, config.drawAirPressure, config.drawBiomes), wasm.get_heights(config.drawWater));
   drawWorld(wasm.get_pixels(config.drawHeight, config.drawWater, config.drawAirPressure, config.drawBiomes));
   if (config.drawWind)

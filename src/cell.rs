@@ -21,6 +21,9 @@ pub struct Wind(pub vec::Vec2f);
 pub struct Water(pub f32);
 
 #[derive(Copy, Clone)]
+pub struct WaterFlow(pub vec::Vec2f);
+
+#[derive(Copy, Clone)]
 pub struct Heat(pub f32);
 
 #[derive(Copy, Clone)]
@@ -79,6 +82,7 @@ pub struct CellProperties {
     pub air_pressure: AirPressure,
     pub wind: Wind,
     pub water: Water,
+    pub water_flow: WaterFlow,
     pub heat: Heat,
     pub resources: Resources,
 }
@@ -86,13 +90,14 @@ pub struct CellProperties {
 impl CellProperties {
     fn new(description: &world::WorldDescription, x: u32, y: u32) -> CellProperties {
         let waterlevel =
-            (description.waterlevel.get(x, y) - 0.1 - description.heightmap.get(x, y)).max(0.0);
+            (description.waterlevel.get(x, y) - 0.2 - description.heightmap.get(x, y)).max(0.0);
         CellProperties {
             height: Height(description.heightmap.get(x, y)),
             gradient: Gradient(vec::Vec2f::new(0.0, 0.0)),
             air_pressure: AirPressure(1.0),
             wind: Wind(vec::Vec2f::new(0.0, 0.0)),
             water: Water(waterlevel),
+            water_flow: WaterFlow(vec::Vec2f::new(0.0, 0.0)),
             heat: Heat(description.heightmap.get(x, y)),
             resources: Resources(0.0),
         }
@@ -109,6 +114,7 @@ impl CellProperties {
             air_pressure: update_air_pressure(delta, neighborhood),
             wind: update_wind(delta, neighborhood),
             water: update_water(delta, neighborhood),
+            water_flow: update_water_flow(delta, neighborhood),
             heat: update_heat(delta, neighborhood),
             resources: update_resources(delta, neighborhood),
         }
@@ -181,6 +187,21 @@ fn update_wind(delta: f32, neighborhood: &Neighborhood) -> Wind {
     ))
 }
 
+fn update_water(delta: f32, neighborhood: &Neighborhood) -> Water {
+    let water_propagation_factor = 0.5;
+
+    let diff_down = neighborhood.down.water_flow.0.get(1);
+    let diff_up = -neighborhood.up.water_flow.0.get(1);
+    let diff_left = neighborhood.left.water_flow.0.get(0);
+    let diff_right = -neighborhood.right.water_flow.0.get(0);
+
+    Water(
+        (neighborhood.me.water.0
+            + delta * water_propagation_factor * (diff_down + diff_up + diff_left + diff_right))
+            .max(0.0),
+    )
+}
+
 fn water_diff(me: CellProperties, close: CellProperties, wind: f32) -> f32 {
     let wind_factor = 0.1;
 
@@ -196,10 +217,11 @@ fn water_diff(me: CellProperties, close: CellProperties, wind: f32) -> f32 {
     }
 }
 
-fn update_water(delta: f32, neighborhood: &Neighborhood) -> Water {
-    let water_propagation_factor = 1.0;
+fn update_water_flow(delta: f32, neighborhood: &Neighborhood) -> WaterFlow {
+    let water_flow_propagation_factor = 0.9;
 
     let (wind_x, wind_y) = neighborhood.me.wind.0.xy();
+    let (current_x, current_y) = neighborhood.me.water_flow.0.xy();
 
     let diff_up = water_diff(
         neighborhood.me,
@@ -222,11 +244,16 @@ fn update_water(delta: f32, neighborhood: &Neighborhood) -> Water {
         -neighborhood.right.wind.0.xy().0 - wind_x,
     );
 
-    Water(
-        (neighborhood.me.water.0
-            + delta * water_propagation_factor * (diff_up + diff_down + diff_left + diff_right))
-            .max(0.0),
-    )
+    let flow = vec::Vec2f::new(
+        current_x + delta * water_flow_propagation_factor * (diff_left - diff_right - current_x),
+        current_y + delta * water_flow_propagation_factor * (diff_down - diff_up - current_y),
+    );
+
+    if vec::len(&flow) < neighborhood.me.water.0 {
+        WaterFlow(flow)
+    } else {
+        WaterFlow(vec::mul(neighborhood.me.water.0, &vec::normalize(&flow)))
+    }
 }
 
 fn update_heat(delta: f32, neighborhood: &Neighborhood) -> Heat {
