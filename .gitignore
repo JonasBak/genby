@@ -1,3 +1,12 @@
 /target
 **/*.rs.bk
 /bin
+/example-build
+/pkg
+/src
+/www
+.crates.toml
+Cargo.lock
+Cargo.toml
+wasm-pack.log
+
